@@ -10,18 +10,17 @@ use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
 
 use Game2DEngine::animation::*;
+use Game2DEngine::collision::*;
 use Game2DEngine::graphics::Screen;
 use Game2DEngine::tiles::*;
 use Game2DEngine::types::*;
-
-// use engine2d::collision::*;
 // Imagine a Resources struct (we'll call it AssetDB or Assets in the future)
 // which wraps all accesses to textures, sounds, animations, etc.
 use Game2DEngine::resources::*;
 use Game2DEngine::texture::Texture;
 
-const WIDTH: usize = 320 * 2;
-const HEIGHT: usize = 240 * 2;
+const WIDTH: usize = 320;
+const HEIGHT: usize = 240;
 const CHARACTER: char = 'b';
 const SIZE: f32 = 20.0;
 
@@ -106,11 +105,6 @@ impl State for Title {
         frame: usize,
         key_input: &WinitInputHelper,
     ) -> StateResult {
-        if key_input.key_held(VirtualKeyCode::Down) {
-            _game.velocities[0].1 = 5;
-        } else {
-            _game.velocities[0].1 /= 2;
-        }
         if key_input.key_held(VirtualKeyCode::P) {
             println!("hitting p");
             StateResult::Swap(Box::new(Scroll()))
@@ -145,23 +139,107 @@ struct Scroll();
 impl State for Scroll {
     fn update(
         &mut self,
-        game: &mut GameState,
+        _game: &mut GameState,
         resources: &Resources,
         levels: &Vec<Level>,
         frame: usize,
         key_input: &WinitInputHelper,
     ) -> StateResult {
-        StateResult::Keep
+        _game.level = 0;
+        // StateResult::Keep
+        if key_input.key_held(VirtualKeyCode::Right) {
+            _game.velocities[0].0 = 5;
+        } else {
+            _game.velocities[0].0 /= 2;
+        }
+        if key_input.key_held(VirtualKeyCode::Left) {
+            _game.velocities[0].0 = -5;
+        } else {
+            _game.velocities[0].0 /= 2;
+        }
+        if key_input.key_held(VirtualKeyCode::Up) {
+            _game.velocities[0].1 = -5;
+        } else {
+            _game.velocities[0].1 /= 2;
+            _game.velocities[0].1 = 2;
+        }
+        if key_input.key_held(VirtualKeyCode::Down) {
+            _game.velocities[0].1 = 5;
+        } else {
+            _game.velocities[0].1 /= 2;
+        }
+        if key_input.key_held(VirtualKeyCode::Space) {
+            _game.game_data.score += 1;
+        } else {
+            _game.game_data.score += 0;
+        }
+        // Determine enemy velocity
+        // Update all entities' positions
+        let speed_multiplier = _game.game_data.speed_multiplier;
+        for (posn, vel) in _game.positions.iter_mut().zip(_game.velocities.iter()) {
+            posn.0 += vel.0 * speed_multiplier as i32;
+            posn.1 += vel.1 * speed_multiplier as i32;
+            _game.camera.0 += vel.0;
+            _game.camera.1 += vel.1;
+        }
+
+        // Detect collisions: Convert positions and sizes to collision bodies, generate contacts
+        // Outline of a possible approach to tile collision:
+        for (ei, (pos, size)) in (_game.positions.iter().zip(_game.sizes.iter())).enumerate() {
+            // get corner positions
+            let tl = Vec2i(pos.0, pos.1);
+            let tr = Vec2i(pos.0 + size.0 as i32, pos.1);
+            let br = Vec2i(pos.0 + size.0 as i32, pos.1 + size.0 as i32);
+            let bl = Vec2i(pos.0, pos.1 + size.0 as i32);
+
+            let map = &levels[_game.level].0;
+            let (ttl, tlrect) = map.tile_and_bounds_at(tl);
+            let (ttr, trrect) = map.tile_and_bounds_at(tr);
+            let (btl, blrect) = map.tile_and_bounds_at(bl);
+            let (btr, brect) = map.tile_and_bounds_at(br);
+            // let ttr = map.tile_at(tr);
+            // ...
+            let sprite_rect = Rect {
+                x: pos.0,
+                y: pos.1,
+                w: size.0 as u16,
+                h: size.1 as u16,
+            };
+            if ttl.solid {
+                if let Some(displacement) = rect_displacement(sprite_rect, tlrect) {
+                    // make contact out of displacment
+                    // define contact 
+                }
+            }
+            // ...
+        }
+
+        if key_input.key_held(VirtualKeyCode::X) {
+            StateResult::Remove
+        } else {
+            StateResult::Keep
+        }
     }
     fn display(
         &self,
-        game: &GameState,
+        _game: &GameState,
         resources: &Resources,
         levels: &Vec<Level>,
         screen: &mut Screen,
         frame: usize,
     ) {
-        
+        println!("Title: p to play");
+        screen.clear(Rgba(80, 80, 80, 255));
+        screen.set_scroll(_game.camera);
+        levels[_game.level].0.draw(screen);
+        for ((pos, tex), anim) in _game
+            .positions
+            .iter()
+            .zip(_game.textures.iter())
+            .zip(_game.anim_state.iter())
+        {
+            screen.bitblt(tex, anim.frame(), *pos);
+        }
     }
 }
 
@@ -254,50 +332,53 @@ fn main() {
             Tilemap::new(
                 Vec2i(0, 0),
                 // Map size
-                (32, 32),
+                (32, 8),
                 &tileset,
                 // Tile grid
                 vec![
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 7,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 8, 0, 9, 0, 10, 0, 0, 0, 0, 0, 8, 8, 8, 0, 8, 8, 8, 0, 8, 8, 8, 0, 8, 0,
-                    0, 0, 0, 0, 8, 0, 0, 8, 0, 0, 9, 0, 0, 7, 0, 0, 0, 0, 8, 0, 8, 0, 0, 8, 0, 0,
-                    8, 0, 8, 0, 8, 0, 8, 8, 8, 0, 0, 8, 0, 8, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 8, 8,
-                    8, 0, 8, 0, 0, 0, 8, 8, 8, 0, 8, 0, 8, 0, 8, 0, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0,
-                    0, 0, 0, 0, 8, 0, 0, 0, 8, 8, 8, 0, 8, 0, 0, 0, 8, 0, 8, 0, 8, 8, 0, 0, 8, 0,
-                    0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 8,
-                    8, 8, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 8, 0,
-                    0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 7, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 8, 0, 0, 0, 0, 7, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0,
-                    9, 0, 10, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 0, 8, 0, 6, 0, 0, 0, 0, 0, 9, 0,
-                    0, 0, 0, 0, 0, 0, 9, 0, 0, 7, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 8, 8, 0, 0, 6,
-                    8, 8, 8, 8, 9, 8, 8, 8, 8, 8, 8, 8, 9, 0, 0, 0, 5, 0, 0, 0, 8, 0, 0, 0, 8, 0,
-                    8, 0, 0, 0, 0, 0, 10, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0,
-                    8, 0, 8, 0, 8, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0,
-                    0, 0, 0, 0, 0, 0, 8, 8, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9, 0, 0, 0,
-                    0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8,
-                    8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 7, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 8, 0, 8, 0, 0, 0, 0, 7, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 10, 0,
-                    0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 0, 8, 0, 6, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0,
-                    0, 0, 9, 0, 0, 7, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 8, 8, 0, 0, 6, 8, 8, 8, 8,
-                    9, 8, 8, 8, 8, 8, 8, 8, 9, 0, 0, 0, 5, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 0, 0, 0,
-                    0, 0, 10, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 8, 0,
-                    8, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0,
-                    0, 0, 8, 8, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9, 0, 0, 0, 0, 0, 0, 0,
-                    9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 0, 0, 0,
-                    0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    8, 0, 8, 0, 0, 0, 0, 7, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 10, 0, 0, 0, 0, 0,
-                    8, 0, 0, 0, 8, 0, 8, 0, 8, 0, 6, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0,
-                    0, 7, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 8, 8, 0, 0, 6, 8, 8, 8, 8, 9, 8, 8, 8,
-                    8, 8, 8, 8, 9, 0, 0, 0, 5, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 0, 0, 0, 0, 0, 10, 0,
-                    0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 8, 0, 8, 0, 8, 8,
-                    8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 8,
-                    0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0,
-                    0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    8, 8, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 8, 8, 0, 0, 8, 0, 0, 0, 8, 0, 9, 0, 10, 0, 0, 0, 0, 0, 8, 8,
+                    8, 0, 8, 8, 8, 0, 8, 8, 8, 0, 8, 0, 8, 8, 0, 0, 8, 0, 0, 0, 0, 0, 8, 0, 0, 8,
+                    0, 0, 9, 0, 0, 7, 0, 0, 0, 0, 8, 0, 8, 0, 0, 8, 0, 0, 8, 8, 0, 0, 8, 0, 8, 0,
+                    8, 0, 8, 0, 8, 8, 8, 0, 0, 8, 0, 8, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 8, 8, 8, 8,
+                    0, 0, 8, 0, 8, 0, 8, 0, 0, 0, 8, 8, 8, 0, 8, 0, 8, 0, 8, 0, 0, 0, 8, 0, 0, 0,
+                    9, 0, 0, 0, 8, 8, 0, 0, 8, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 8, 8, 0, 8, 0, 0, 0,
+                    8, 0, 8, 0, 8, 8, 0, 0, 8, 0, 8, 8, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0,
+                    8, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 8, 8, 8, 0, 0, 8,
+                    0,
+                    //  0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 8, 0,
+                    // 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    // 0, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 7, 0, 0, 0, 0,
+                    // 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 8, 0, 0, 0, 0, 7, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0,
+                    // 9, 0, 10, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 0, 8, 0, 6, 0, 0, 0, 0, 0, 9, 0,
+                    // 0, 0, 0, 0, 0, 0, 9, 0, 0, 7, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 8, 8, 0, 0, 6,
+                    // 8, 8, 8, 8, 9, 8, 8, 8, 8, 8, 8, 8, 9, 0, 0, 0, 5, 0, 0, 0, 8, 0, 0, 0, 8, 0,
+                    // 8, 0, 0, 0, 0, 0, 10, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0,
+                    // 8, 0, 8, 0, 8, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0,
+                    // 0, 0, 0, 0, 0, 0, 8, 8, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9, 0, 0, 0,
+                    // 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8,
+                    // 8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 7, 0, 0, 0, 0, 0, 0, 0, 0,
+                    // 0, 0, 0, 0, 8, 0, 8, 0, 0, 0, 0, 7, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 10, 0,
+                    // 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 0, 8, 0, 6, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0,
+                    // 0, 0, 9, 0, 0, 7, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 8, 8, 0, 0, 6, 8, 8, 8, 8,
+                    // 9, 8, 8, 8, 8, 8, 8, 8, 9, 0, 0, 0, 5, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 0, 0, 0,
+                    // 0, 0, 10, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 8, 0,
+                    // 8, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0,
+                    // 0, 0, 8, 8, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9, 0, 0, 0, 0, 0, 0, 0,
+                    // 9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 0, 0, 0,
+                    // 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    // 8, 0, 8, 0, 0, 0, 0, 7, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 10, 0, 0, 0, 0, 0,
+                    // 8, 0, 0, 0, 8, 0, 8, 0, 8, 0, 6, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0,
+                    // 0, 7, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 8, 8, 0, 0, 6, 8, 8, 8, 8, 9, 8, 8, 8,
+                    // 8, 8, 8, 8, 9, 0, 0, 0, 5, 0, 0, 0, 8, 0, 0, 0, 8, 0, 8, 0, 0, 0, 0, 0, 10, 0,
+                    // 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 8, 0, 8, 0, 8, 8,
+                    // 8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 8,
+                    // 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0,
+                    // 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    // 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 ],
             ),
             // Initial entities on level start
@@ -307,7 +388,7 @@ fn main() {
     let player_tex = rsrc.load_texture(Path::new("content/tiles128.png"));
     let player_anim = Rc::new(Animation::freeze(Rect {
         x: 0,
-        y: 32,
+        y: 96,
         w: 32,
         h: 32,
     }));

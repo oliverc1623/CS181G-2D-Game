@@ -87,7 +87,7 @@ impl Tilemap {
 
     pub fn tile_id_at(&self, Vec2i(x, y): Vec2i) -> TileID {
         // Translate into map coordinates
-        let x = (x - self.position.0) / TILE_SZ as i32;
+        let x = (x - self.position.0) / TILE_SZ as i32; // invert operation to get world coordinates
         let y = (y - self.position.1) / TILE_SZ as i32;
         assert!(
             x >= 0 && x < self.dims.0 as i32,
@@ -110,6 +110,15 @@ impl Tilemap {
         self.tileset[self.tile_id_at(posn)]
     }
     // ...
+    pub fn tile_and_bounds_at(&self, pos: Vec2i) -> (Tile, Rect){
+        let tile = self.tile_at(pos);
+
+        // convert real coordinate to tile coordinates
+        let x = (pos.0 - self.position.0) / TILE_SZ as i32; // invert operation to get world coordinates
+        let y = (pos.1 - self.position.1) / TILE_SZ as i32;
+
+        (tile, Rect{x: x*TILE_SZ as i32 + self.position.0, y: y*TILE_SZ as i32  + self.position.1 , w:TILE_SZ as u16 , h:TILE_SZ as u16})
+    }
     /// Draws the portion of self appearing within screen.
     /// This could just as well be an extension trait on Screen defined in =tiles.rs= or something, like we did for =sprite.rs= and =draw_sprite=.
     pub fn draw(&self, screen: &mut Screen) {
