@@ -120,7 +120,7 @@ impl State for Title {
         screen: &mut Screen,
         frame: usize,
     ) {
-        println!("Title: p to play");
+        // println!("Title: p to play");
         screen.clear(Rgba(80, 80, 80, 255));
         screen.set_scroll(_game.camera);
         levels[_game.level].0.draw(screen);
@@ -185,34 +185,9 @@ impl State for Scroll {
 
         // Detect collisions: Convert positions and sizes to collision bodies, generate contacts
         // Outline of a possible approach to tile collision:
-        for (ei, (pos, size)) in (_game.positions.iter().zip(_game.sizes.iter())).enumerate() {
-            // get corner positions
-            let tl = Vec2i(pos.0, pos.1);
-            let tr = Vec2i(pos.0 + size.0 as i32, pos.1);
-            let br = Vec2i(pos.0 + size.0 as i32, pos.1 + size.0 as i32);
-            let bl = Vec2i(pos.0, pos.1 + size.0 as i32);
-
-            let map = &levels[_game.level].0;
-            let (ttl, tlrect) = map.tile_and_bounds_at(tl);
-            let (ttr, trrect) = map.tile_and_bounds_at(tr);
-            let (btl, blrect) = map.tile_and_bounds_at(bl);
-            let (btr, brect) = map.tile_and_bounds_at(br);
-            // let ttr = map.tile_at(tr);
-            // ...
-            let sprite_rect = Rect {
-                x: pos.0,
-                y: pos.1,
-                w: size.0 as u16,
-                h: size.1 as u16,
-            };
-            if ttl.solid {
-                if let Some(displacement) = rect_displacement(sprite_rect, tlrect) {
-                    // make contact out of displacment
-                    // define contact 
-                }
-            }
-            // ...
-        }
+        let mut contacts = vec![];
+        gather_contacts(&_game.positions, &_game.sizes, &[&levels[_game.level].0], &mut contacts);
+        restitute(&mut _game.positions, &_game.sizes, &mut _game.velocities, &mut _game.camera, &[&levels[_game.level].0], &mut contacts);
 
         if key_input.key_held(VirtualKeyCode::X) {
             StateResult::Remove
@@ -228,7 +203,7 @@ impl State for Scroll {
         screen: &mut Screen,
         frame: usize,
     ) {
-        println!("Title: p to play");
+        // println!("Title: p to play");
         screen.clear(Rgba(80, 80, 80, 255));
         screen.set_scroll(_game.camera);
         levels[_game.level].0.draw(screen);
@@ -288,9 +263,9 @@ fn main() {
             Tile { solid: true },  // 4
             Tile { solid: true },  // 5
             Tile { solid: false }, // 6
-            Tile { solid: false }, // 7
+            Tile { solid: true }, // 7
             Tile { solid: true },  // 8
-            Tile { solid: false }, // 9
+            Tile { solid: true }, // 9
             Tile { solid: true },  // 10
             Tile { solid: true },  // 11
             Tile { solid: false }, // 12

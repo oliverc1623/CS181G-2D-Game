@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 pub const TILE_SZ: usize = 32;
 /// A graphical tile
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Tile {
     pub solid: bool, // ... any extra data like collision flags or other properties
 }
@@ -55,6 +55,7 @@ impl Tileset {
     }
 }
 /// An actual tilemap
+// #[derive(Copy)]
 pub struct Tilemap {
     /// Where the tilemap is in space, use your favorite number type here
     pub position: Vec2i,
@@ -110,14 +111,22 @@ impl Tilemap {
         self.tileset[self.tile_id_at(posn)]
     }
     // ...
-    pub fn tile_and_bounds_at(&self, pos: Vec2i) -> (Tile, Rect){
+    pub fn tile_and_bounds_at(&self, pos: Vec2i) -> (Tile, Rect) {
         let tile = self.tile_at(pos);
 
         // convert real coordinate to tile coordinates
         let x = (pos.0 - self.position.0) / TILE_SZ as i32; // invert operation to get world coordinates
         let y = (pos.1 - self.position.1) / TILE_SZ as i32;
 
-        (tile, Rect{x: x*TILE_SZ as i32 + self.position.0, y: y*TILE_SZ as i32  + self.position.1 , w:TILE_SZ as u16 , h:TILE_SZ as u16})
+        (
+            tile,
+            Rect {
+                x: x * TILE_SZ as i32 + self.position.0,
+                y: y * TILE_SZ as i32 + self.position.1,
+                w: TILE_SZ as u16,
+                h: TILE_SZ as u16,
+            },
+        )
     }
     /// Draws the portion of self appearing within screen.
     /// This could just as well be an extension trait on Screen defined in =tiles.rs= or something, like we did for =sprite.rs= and =draw_sprite=.
