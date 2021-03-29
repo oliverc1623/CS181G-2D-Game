@@ -160,7 +160,6 @@ pub fn gather_contacts(
             println!("jump reset btr");
             *num_jumps = 0;
         }
-
     }
 }
 

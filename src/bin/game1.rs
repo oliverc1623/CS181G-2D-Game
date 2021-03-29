@@ -30,7 +30,7 @@ enum EntityType {
     Enemy,
 }
 
-type Level = (Tilemap, Vec<(EntityType, i32, i32)>);
+type Level = (Vec<Tilemap>, Vec<(EntityType, i32, i32)>);
 
 struct GameData {
     score: usize,
@@ -108,6 +108,50 @@ impl State for Title {
         frame: usize,
         key_input: &WinitInputHelper,
     ) -> StateResult {
+        // _game.positions[0] = Vec2i(levels[1].1[0].1 * 16, levels[1].1[0].2 * 16);
+        let max_vel = 20;
+        let min_vel = -20;
+        if key_input.key_held(VirtualKeyCode::Right){
+            // _game.velocities[0].0 = 7;
+            // println!("right vel {:}", _game.velocities[0].0);
+            if _game.velocities[0].0 < max_vel {
+                // println!("inside");
+                _game.velocities[0].0 +=2;
+                // println!("inside {:}", _game.velocities[0].0);
+            }
+            _game.anim_state[0].tick();
+        } else if key_input.key_released(VirtualKeyCode::Right) {
+            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
+            // println!("after {:}", _game.velocities[0].0);
+        }
+        if key_input.key_held(VirtualKeyCode::Left) {
+            if _game.velocities[0].0 > min_vel {
+                // println!("inside");
+                _game.velocities[0].0 -=2;
+                // println!("inside {:}", _game.velocities[0].0);
+            }
+        } else if key_input.key_released(VirtualKeyCode::Left) {
+            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
+        }
+        if key_input.key_held(VirtualKeyCode::Up) {
+            // println!("jumps {:}", _game.game_data.num_jumps);
+            if _game.game_data.num_jumps < 2 {
+                _game.velocities[0].1 = -5;            
+                _game.game_data.num_jumps += 1;
+            }
+        } else if key_input.key_released(VirtualKeyCode::Up) {
+            _game.velocities[0].1 /= 2;
+            _game.velocities[0].1 = 2;            
+        }
+        if key_input.key_held(VirtualKeyCode::Down) {
+            if _game.velocities[0].1 < max_vel {
+                _game.velocities[0].1 +=2;
+                // println!("inside {:}", _game.velocities[0].0);
+            }
+        } else if key_input.key_released(VirtualKeyCode::Down) {
+            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
+        }
+
         if key_input.key_held(VirtualKeyCode::P) {
             // println!("hitting p");
             StateResult::Swap(Box::new(Scroll()))
@@ -124,9 +168,13 @@ impl State for Title {
         frame: usize,
     ) {
         // println!("Title: p to play");
-        screen.clear(Rgba(80, 80, 80, 255));
+        screen.clear(Rgba(211, 211, 211, 255));
         screen.set_scroll(_game.camera);
-        levels[_game.level].0.draw(screen);
+        // levels[_game.level].0.draw(screen);
+        let maps = &levels[1].0;
+        for map in maps {
+            map.draw(screen);
+        }
         for ((pos, tex), anim) in _game
             .positions
             .iter()
@@ -208,7 +256,7 @@ impl State for Scroll {
         gather_contacts(
             &_game.positions,
             &_game.sizes,
-            &[&levels[_game.level].0],
+            &[&levels[_game.level].0[0]],
             &mut contacts,
             &mut _game.game_data.num_jumps,
         );
@@ -217,7 +265,7 @@ impl State for Scroll {
             &_game.sizes,
             &mut _game.velocities,
             &mut _game.camera,
-            &[&levels[_game.level].0],
+            &[&levels[_game.level].0[0]],
             &mut contacts,
         );
 
@@ -246,7 +294,8 @@ impl State for Scroll {
         // screen.clear(Rgba(80, 80, 80, 255));
         screen.bitblt(&_game.textures[2], Rect{x: 0, y: 0, w: WIDTH as u16, h:HEIGHT as u16}, _game.background_pos);
         screen.set_scroll(_game.camera);
-        levels[_game.level].0.draw(screen);
+        // let x = levels[0].0[0];
+        levels[_game.level].0[0].draw(screen); //levels[0].0
         for ((pos, tex), anim) in _game
             .positions
             .iter()
@@ -320,7 +369,7 @@ fn main() {
     let levels: Vec<Level> = vec![
         ( // level 0 is the side scroller
             // The map
-            Tilemap::new(
+            vec![Tilemap::new(
                 Vec2i(0, 0),
                 // Map size
                 (32, 16),
@@ -345,46 +394,238 @@ fn main() {
                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8,
                     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
                 ],
-            ),
+            )],
             // Initial entities on level start
-            vec![
-                (EntityType::Player, 15, 29),
-                (EntityType::Enemy, 10, 10),
-                (EntityType::Enemy, 9, 6),
-                (EntityType::Enemy, 11, 6),
-                (EntityType::Enemy, 12, 6),
-                (EntityType::Enemy, 10, 7),
-                (EntityType::Enemy, 10, 5),
-                (EntityType::Enemy, 11, 4),
-                (EntityType::Enemy, 12, 7),
-                (EntityType::Enemy, 11, 7),
-                (EntityType::Enemy, 10, 8),
-                (EntityType::Enemy, 12, 3),
-            ],
+            vec![(EntityType::Player, 15, 29)], // TODO: add three other player types
         ),
         ( // level 1 is the overworld map
             // The map
-            Tilemap::new(
+            vec![Tilemap::new(// tilemap 1
                 Vec2i(0, 0),
-                // Map size
-                (32, 8),
+                (8, 8),
                 &tileset,
-                // Tile grid
                 vec![
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 7,
-                    8, 8, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 8, 8, 0, 0, 8, 0, 0, 0, 8, 0, 9, 0, 10, 0, 0, 0, 0, 0, 8, 8,
-                    8, 0, 8, 8, 8, 0, 8, 8, 8, 0, 8, 0, 8, 8, 0, 0, 8, 0, 0, 0, 0, 0, 8, 0, 0, 8,
-                    0, 0, 9, 0, 0, 7, 0, 0, 0, 0, 8, 0, 8, 0, 0, 8, 0, 0, 8, 8, 0, 0, 8, 0, 8, 0,
-                    8, 0, 8, 0, 8, 8, 8, 0, 0, 8, 0, 8, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 8, 8, 8, 8,
-                    0, 0, 8, 0, 8, 0, 8, 0, 0, 0, 8, 8, 8, 0, 8, 0, 8, 0, 8, 0, 0, 0, 8, 0, 0, 0,
-                    9, 0, 0, 0, 8, 8, 0, 0, 8, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 8, 8, 0, 8, 0, 0, 0,
-                    8, 0, 8, 0, 8, 8, 0, 0, 8, 0, 8, 8, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0,
-                    8, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 8, 8, 8, 0, 0, 8, 0,
-                ],
-            ),
+                    8, 8, 8, 8, 8, 8, 8, 8,
+                    8, 8, 8, 8, 8, 8, 5, 8,
+                    8, 8, 12, 8, 8, 8, 8, 8,
+                    8, 8, 8, 8, 12, 8, 8, 8,
+                    8, 9, 9, 8, 8, 9, 8, 8,
+                    2, 2, 2, 2, 2, 2, 2, 2,
+                    8, 8, 9, 9, 8, 9, 9, 8,
+                    8, 8, 8, 8, 8, 8, 12, 8,
+                ]), Tilemap::new(// tilemap 2
+                    Vec2i(256, 0),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 8, 0, 8, 8, 8, 5, 8,
+                        8, 8, 0, 8, 8, 8, 12, 8,
+                        8, 8, 0, 8, 12, 8, 8, 8,
+                        8, 9, 0, 8, 8, 8, 8, 8,
+                        2, 2, 2, 8, 8, 6, 8, 8,
+                        8, 8, 9, 9, 8, 8, 8, 7,
+                        8, 8, 8, 8, 8, 8, 12, 8,
+                    ],
+                ), Tilemap::new(// tilemap 3
+                    Vec2i(0, 256),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 12, 0, 8, 8, 7, 8, 8,
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 8, 0, 4, 8, 8, 8, 8,
+                        8, 8, 0, 8, 8, 12, 8, 8,
+                        8, 8, 0, 9, 8, 8, 8, 8,
+                        8, 8, 2, 2, 8, 8, 8, 8,
+                        8, 8, 8, 0, 8, 8, 8, 8,
+                    ],
+                ), Tilemap::new(// tilemap 4
+                    Vec2i(256, 256),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 12, 8, 8,
+                        8, 8, 8, 8, 8, 8, 10, 7,
+                        8, 8, 8, 8, 8, 8, 10, 6,
+                        8, 8, 8, 8, 8, 12, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                    ],
+                ), Tilemap::new(// tilemap 5
+                    Vec2i(0, 256 * 2),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 5, 8,
+                        8, 8, 12, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 12, 8, 8, 8,
+                        8, 9, 9, 8, 8, 9, 8, 8,
+                        2, 2, 2, 2, 2, 2, 2, 2,
+                        8, 8, 9, 9, 8, 9, 9, 8,
+                        8, 8, 8, 8, 8, 8, 12, 8,
+                    ],
+                ), Tilemap::new(// tilemap 6
+                    Vec2i(0, 256 * 3),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 8, 0, 8, 8, 8, 5, 8,
+                        8, 8, 0, 8, 8, 8, 12, 8,
+                        8, 8, 0, 8, 12, 8, 8, 8,
+                        8, 9, 0, 8, 8, 8, 8, 8,
+                        2, 2, 2, 8, 8, 6, 8, 8,
+                        8, 8, 9, 9, 8, 8, 8, 7,
+                        8, 8, 8, 8, 8, 8, 12, 8,
+                    ],
+                ), Tilemap::new(// tilemap 7
+                    Vec2i(256, 256 * 2),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 12, 0, 8, 8, 7, 8, 8,
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 8, 0, 4, 8, 8, 8, 8,
+                        8, 8, 0, 8, 8, 12, 8, 8,
+                        8, 8, 0, 9, 8, 8, 8, 8,
+                        8, 8, 2, 2, 8, 8, 8, 8,
+                        8, 8, 8, 0, 8, 8, 8, 8,
+                    ],
+                ), Tilemap::new(// tilemap 8
+                    Vec2i(256, 256 * 3),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 12, 8, 8,
+                        8, 8, 8, 8, 8, 8, 10, 7,
+                        8, 8, 8, 8, 8, 8, 10, 6,
+                        8, 8, 8, 8, 8, 12, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                    ],
+                ), Tilemap::new(// tilemap 9
+                    Vec2i(256 * 2, 0),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 5, 8,
+                        8, 8, 12, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 12, 8, 8, 8,
+                        8, 9, 9, 8, 8, 9, 8, 8,
+                        2, 2, 2, 2, 2, 2, 2, 2,
+                        8, 8, 9, 9, 8, 9, 9, 8,
+                        8, 8, 8, 8, 8, 8, 12, 8,
+                    ],
+                ), Tilemap::new(// tilemap 10
+                    Vec2i(256 * 2, 256),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 8, 0, 8, 8, 8, 5, 8,
+                        8, 8, 0, 8, 8, 8, 12, 8,
+                        8, 8, 0, 8, 12, 8, 8, 8,
+                        8, 9, 0, 8, 8, 8, 8, 8,
+                        2, 2, 2, 8, 8, 6, 8, 8,
+                        8, 8, 9, 9, 8, 8, 8, 7,
+                        8, 8, 8, 8, 8, 8, 12, 8,
+                    ],
+                ), Tilemap::new(// tilemap 11
+                    Vec2i(256 * 2, 256 * 2),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 12, 0, 8, 8, 7, 8, 8,
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 8, 0, 4, 8, 8, 8, 8,
+                        8, 8, 0, 8, 8, 12, 8, 8,
+                        8, 8, 0, 9, 8, 8, 8, 8,
+                        8, 8, 2, 2, 8, 8, 8, 8,
+                        8, 8, 8, 0, 8, 8, 8, 8,
+                    ],
+                ), Tilemap::new(// tilemap 12
+                    Vec2i(256 * 2, 256 * 3),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 12, 8, 8,
+                        8, 8, 8, 8, 8, 8, 10, 7,
+                        8, 8, 8, 8, 8, 8, 10, 6,
+                        8, 8, 8, 8, 8, 12, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                    ],
+                ), Tilemap::new(// tilemap 13
+                    Vec2i(256 * 3, 0),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 5, 8,
+                        8, 8, 12, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 12, 8, 8, 8,
+                        8, 9, 9, 8, 8, 9, 8, 8,
+                        2, 2, 2, 2, 2, 2, 2, 2,
+                        8, 8, 9, 9, 8, 9, 9, 8,
+                        8, 8, 8, 8, 8, 8, 12, 8,
+                    ],
+                ), Tilemap::new(// tilemap 14
+                    Vec2i(256 * 3, 256),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 8, 0, 8, 8, 8, 5, 8,
+                        8, 8, 0, 8, 8, 8, 12, 8,
+                        8, 8, 0, 8, 12, 8, 8, 8,
+                        8, 9, 0, 8, 8, 8, 8, 8,
+                        2, 2, 2, 8, 8, 6, 8, 8,
+                        8, 8, 9, 9, 8, 8, 8, 7,
+                        8, 8, 8, 8, 8, 8, 12, 8,
+                    ],
+                ), Tilemap::new(// tilemap 15
+                    Vec2i(256 * 3, 256 * 2),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 12, 0, 8, 8, 7, 8, 8,
+                        8, 8, 0, 8, 8, 8, 8, 8,
+                        8, 8, 0, 4, 8, 8, 8, 8,
+                        8, 8, 0, 8, 8, 12, 8, 8,
+                        8, 8, 0, 9, 8, 8, 8, 8,
+                        8, 8, 2, 2, 8, 8, 8, 8,
+                        8, 8, 8, 0, 8, 8, 8, 8,
+                    ],
+                ), Tilemap::new( // tilemap 16
+                    Vec2i(256 * 3, 256 * 3),
+                    (8, 8),
+                    &tileset,
+                    vec![
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 12, 8, 8,
+                        8, 8, 8, 8, 8, 8, 10, 7,
+                        8, 8, 8, 8, 8, 8, 10, 6,
+                        8, 8, 8, 8, 8, 12, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                        8, 8, 8, 8, 8, 8, 8, 8,
+                    ],
+                )],
             // Initial entities on level start
-            vec![(EntityType::Player, 10, 6), (EntityType::Enemy, 20, 16)],
+            vec![(EntityType::Player, 10, 6)],
         ),
     ];
     let player_tex = rsrc.load_texture(Path::new("content/wiry_all_side.png"));
@@ -416,6 +657,28 @@ fn main() {
         w: 32,
         h: 32,
     }));
+    let overworld_player_tex = rsrc.load_texture(Path::new("content/wiry_all.png"));
+    let overworld_player_anim = Rc::new(Animation::new(
+        vec![
+            (Rect {
+                x: 0,
+                y: 0,
+                w: 32,
+                h: 32,
+            }, 8),
+            (Rect {
+                x: 32,
+                y: 0,
+                w: 32,
+                h: 32,
+            }, 8),
+            (Rect {
+                x: 64,
+                y: 0,
+                w: 32,
+                h: 32,
+            }, 8),
+        ],  true));
     let background_tex = rsrc.load_texture(Path::new("C:/Users/Oliver Chang/Documents/cs181g/Game2DEngine/content/badland_background.png"));
     // And here's our game state, which is just stuff that changes.
     // We'll say an entity is a type, a position, a velocity, a size, a texture, and an animation state.
@@ -426,29 +689,16 @@ fn main() {
         types: vec![
             // In a real example we'd provide nicer accessors than this
             levels[0].1[0].0,
-            levels[0].1[1].0,
+            // levels[0].1[1].0,
         ],
         positions: vec![
             Vec2i(levels[0].1[0].1 * 16, levels[0].1[0].2 * 16), // player pos
-            Vec2i(levels[0].1[1].1 * 16, levels[0].1[1].2 * 16),
-            Vec2i(levels[0].1[2].1 * 16, levels[0].1[2].2 * 16),
-            Vec2i(levels[0].1[3].1 * 16, levels[0].1[3].2 * 16),
-            Vec2i(levels[0].1[4].1 * 16, levels[0].1[4].2 * 16),
-            Vec2i(levels[0].1[5].1 * 16, levels[0].1[5].2 * 16),
-            Vec2i(levels[0].1[6].1 * 16, levels[0].1[6].2 * 16),
-            Vec2i(levels[0].1[7].1 * 16, levels[0].1[7].2 * 16),
-            Vec2i(levels[0].1[8].1 * 16, levels[0].1[8].2 * 16),
-            Vec2i(levels[0].1[9].1 * 16, levels[0].1[9].2 * 16),
-            Vec2i(levels[0].1[10].1 * 16, levels[0].1[10].2 * 16)
         ],
-        velocities: vec![Vec2i(0, 0), Vec2i(0, 0), Vec2i(0, 0)],
-        sizes: vec![(32, 32), 
-                    (32, 32), 
-                    (32, 32),
-                    (32, 32)],
+        velocities: vec![Vec2i(0, 0)],
+        sizes: vec![(32, 32)],
         // Could be texture handles instead, let's talk about that in two weeks
-        textures: vec![Rc::clone(&player_tex), Rc::clone(&enemy_tex), Rc::clone(&background_tex)],
-        anim_state: vec![player_anim.start(), enemy_anim.start()],
+        textures: vec![Rc::clone(&player_tex), Rc::clone(&enemy_tex), Rc::clone(&background_tex), Rc::clone(&overworld_player_tex)],
+        anim_state: vec![player_anim.start(), enemy_anim.start(), overworld_player_anim.start()],
         // Current level
         level: 1,
         // Camera position
