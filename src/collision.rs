@@ -188,11 +188,11 @@ pub fn restitute(
                 }
                 if horizontal_mtv < vertical_mtv {
                     if a_rect.x < b_rect.x {
-                        // println!("Box touched left side{:?}", c);
+                        println!("Box touched left side{:?}", c);
                         a_rect.x -= horizontal_mtv;
                     // disp[player_indx] = (horizontal_mtv, 0)
                     } else {
-                        // println!("Box touched right side{:?}", c);
+                        println!("Box touched right side{:?}", c);
                         a_rect.x += horizontal_mtv;
                         // disp[player_indx] = (horizontal_mtv, 0)
                     }
