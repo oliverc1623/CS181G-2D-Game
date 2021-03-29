@@ -35,6 +35,7 @@ type Level = (Tilemap, Vec<(EntityType, i32, i32)>);
 struct GameData {
     score: usize,
     speed_multiplier: usize,
+    num_jumps: usize,
 }
 
 struct GameState {
@@ -149,40 +150,62 @@ impl State for Scroll {
     ) -> StateResult {
         _game.level = 0;
         // StateResult::Keep
-        if key_input.key_held(VirtualKeyCode::Right) {
-            _game.velocities[0].0 = 7;
-        } else {
-            _game.velocities[0].0 /= 2;
+        let max_vel = 20;
+        let min_vel = -20;
+        // println!("before {:}", _game.velocities[0].0);
+        if key_input.key_held(VirtualKeyCode::Right){
+            // _game.velocities[0].0 = 7;
+            // println!("right vel {:}", _game.velocities[0].0);
+            if _game.velocities[0].0 < max_vel {
+                // println!("inside");
+                _game.velocities[0].0 +=2;
+                // println!("inside {:}", _game.velocities[0].0);
+            }
+            _game.anim_state[0].tick();
+        } else if key_input.key_released(VirtualKeyCode::Right) {
+            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
+            // println!("after {:}", _game.velocities[0].0);
         }
         if key_input.key_held(VirtualKeyCode::Left) {
-            _game.velocities[0].0 = -5;
-        } else {
-            _game.velocities[0].0 /= 2;
+            if _game.velocities[0].0 > min_vel {
+                // println!("inside");
+                _game.velocities[0].0 -=2;
+                // println!("inside {:}", _game.velocities[0].0);
+            }
+        } else if key_input.key_released(VirtualKeyCode::Left) {
+            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
         }
-        if key_input.key_pressed(VirtualKeyCode::Up) {
-            _game.velocities[0].1 = -32;
-        } else {
+        if key_input.key_held(VirtualKeyCode::Up) {
+            println!("jumps {:}", _game.game_data.num_jumps);
+            if _game.game_data.num_jumps < 2 {
+                _game.velocities[0].1 = -5;            
+                _game.game_data.num_jumps += 1;
+            }
+        } else if key_input.key_released(VirtualKeyCode::Up) {
             _game.velocities[0].1 /= 2;
-            _game.velocities[0].1 = 5;
+            _game.velocities[0].1 = 2;            
         }
         if key_input.key_held(VirtualKeyCode::Down) {
-            _game.velocities[0].1 = 5;
-        } else {
-            _game.velocities[0].1 /= 2;
-        }
-        if key_input.key_held(VirtualKeyCode::Space) {
-            _game.game_data.score += 1;
-        } else {
-            _game.game_data.score += 0;
+            if _game.velocities[0].1 < max_vel {
+                println!("inside");
+                _game.velocities[0].1 +=2;
+                // println!("inside {:}", _game.velocities[0].0);
+            }
+        } else if key_input.key_released(VirtualKeyCode::Down) {
+            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
         }
         // Determine enemy velocity
         // Update all entities' positions
-        let speed_multiplier = _game.game_data.speed_multiplier;
+        // let speed_multiplier = _game.game_data.speed_multiplier;
         for (posn, vel) in _game.positions.iter_mut().zip(_game.velocities.iter()) {
             posn.0 += vel.0;
             posn.1 += vel.1;
         }
-
+        // reset number of jumps
+        if _game.positions[0].1 == 448 {
+            // println!("touching floor");
+            _game.game_data.num_jumps = 0;
+        }
         // Detect collisions: Convert positions and sizes to collision bodies, generate contacts
         // Outline of a possible approach to tile collision:
         let mut contacts = vec![];
@@ -328,7 +351,7 @@ fn main() {
             ),
             // Initial entities on level start
             vec![
-                (EntityType::Player, 15, 20),
+                (EntityType::Player, 15, 29),
                 (EntityType::Enemy, 10, 10),
                 (EntityType::Enemy, 9, 6),
                 (EntityType::Enemy, 11, 6),
@@ -368,12 +391,27 @@ fn main() {
         ),
     ];
     let player_tex = rsrc.load_texture(Path::new("content/wiry_all_side.png"));
-    let player_anim = Rc::new(Animation::freeze(Rect {
-        x: 0,
-        y: 0,
-        w: 32,
-        h: 32,
-    }));
+    let player_anim = Rc::new(Animation::new(
+        vec![
+            (Rect {
+                x: 0,
+                y: 0,
+                w: 32,
+                h: 32,
+            }, 8),
+            (Rect {
+                x: 32,
+                y: 0,
+                w: 32,
+                h: 32,
+            }, 8),
+            (Rect {
+                x: 64,
+                y: 0,
+                w: 32,
+                h: 32,
+            }, 8),
+        ],  true));
     let enemy_tex = rsrc.load_texture(Path::new("content/tilesheet.png"));
     let enemy_anim = Rc::new(Animation::freeze(Rect {
         x: 0,
@@ -424,6 +462,7 @@ fn main() {
         game_data: GameData {
             score: 0,
             speed_multiplier: 1,
+            num_jumps: 0,
         },
     };
     Game2DEngine::run(
