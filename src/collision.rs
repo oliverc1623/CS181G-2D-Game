@@ -44,6 +44,7 @@ pub fn gather_contacts(
     sizes: &[(usize, usize)],
     tilemap: &[&Tilemap],
     into: &mut Vec<Contact>,
+    num_jumps: &mut usize,
 ) {
     // collide mobiles against mobiles
     for (ai, (apos, asize)) in (positions.iter().zip(sizes.iter())).enumerate() {
@@ -141,6 +142,25 @@ pub fn gather_contacts(
                 });
             }
         }
+
+        if ttl.solid {
+            // println!("jump reset");
+        }
+        if ttr.solid {
+            // println!("touching top right");
+            // println!("jump reset ttr");
+        }
+        if btl.solid {
+            // println!("touching bottom left");
+            println!("jump reset btl");
+            *num_jumps = 0;
+        }
+        if btr.solid {
+            // println!("touching buttom right");
+            println!("jump reset btr");
+            *num_jumps = 0;
+        }
+
     }
 }
 

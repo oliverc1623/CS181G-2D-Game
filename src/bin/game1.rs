@@ -202,10 +202,6 @@ impl State for Scroll {
             posn.1 += vel.1;
         }
         // reset number of jumps
-        if _game.positions[0].1 == 448 {
-            // println!("touching floor");
-            _game.game_data.num_jumps = 0;
-        }
         // Detect collisions: Convert positions and sizes to collision bodies, generate contacts
         // Outline of a possible approach to tile collision:
         let mut contacts = vec![];
@@ -214,6 +210,7 @@ impl State for Scroll {
             &_game.sizes,
             &[&levels[_game.level].0],
             &mut contacts,
+            &mut _game.game_data.num_jumps,
         );
         restitute(
             &mut _game.positions,
@@ -299,29 +296,29 @@ fn main() {
     let mut rsrc = Resources::new();
     let tileset = Rc::new(Tileset::new(
         vec![
-            Tile { solid: false }, // 0
-            Tile { solid: false }, // 1
-            Tile { solid: false }, // 2
-            Tile { solid: false }, // 3
-            Tile { solid: true },  // 4
-            Tile { solid: true },  // 5
-            Tile { solid: false }, // 6
-            Tile { solid: true },  // 7
-            Tile { solid: true },  // 8
-            Tile { solid: false },  // 9
-            Tile { solid: true },  // 10
-            Tile { solid: true },  // 11
-            Tile { solid: false }, // 12
-            Tile { solid: false }, // 13
-            Tile { solid: false }, // 14
-            Tile { solid: false }, // 15
-            Tile { solid: false },
+            Tile { solid: false, jump_reset: false}, // 0
+            Tile { solid: false,  jump_reset: false }, // 1
+            Tile { solid: false,  jump_reset: false  }, // 2
+            Tile { solid: false,  jump_reset: false  }, // 3
+            Tile { solid: true,  jump_reset: false  },  // 4
+            Tile { solid: true,  jump_reset: false  },  // 5
+            Tile { solid: false ,  jump_reset: false }, // 6
+            Tile { solid: true,  jump_reset: false  },  // 7
+            Tile { solid: true,  jump_reset: true  },  // 8 stone
+            Tile { solid: false,  jump_reset: false  },  // 9
+            Tile { solid: true,  jump_reset: false  },  // 10
+            Tile { solid: true ,  jump_reset: false },  // 11
+            Tile { solid: false,  jump_reset: false  }, // 12
+            Tile { solid: false,  jump_reset: false  }, // 13
+            Tile { solid: false,  jump_reset: false  }, // 14
+            Tile { solid: false,  jump_reset: false  }, // 15
+            Tile { solid: false,  jump_reset: false  },
         ],
         &rsrc.load_texture(Path::new("content/tilesheet.png")),
     ));
     // Here's our game rules (the engine doesn't know about these)
     let levels: Vec<Level> = vec![
-        (
+        ( // level 0 is the side scroller
             // The map
             Tilemap::new(
                 Vec2i(0, 0),
@@ -365,7 +362,7 @@ fn main() {
                 (EntityType::Enemy, 12, 3),
             ],
         ),
-        (
+        ( // level 1 is the overworld map
             // The map
             Tilemap::new(
                 Vec2i(0, 0),
@@ -465,6 +462,9 @@ fn main() {
             num_jumps: 0,
         },
     };
+
+    
+
     Game2DEngine::run(
         WIDTH,
         HEIGHT,
