@@ -36,6 +36,7 @@ impl Server {
         }
         let mut buf: [u8; BUFSIZE] = [0; BUFSIZE]; // well memory is cheap
         stream.read(&mut buf).unwrap();
+        stream.set_nonblocking(true);
         let s = std::str::from_utf8(&buf).unwrap();
         let term = s.find("\n").unwrap();
         let id = s[..term].parse::<i32>().unwrap();
@@ -47,6 +48,7 @@ impl Server {
     fn disconnect(&mut self) {
         let mut sock = self.sock.as_ref().unwrap();
         sock.write("{\"op\":\"disconnect\"}\n".as_bytes()).unwrap();
+        sock.flush();
         sock.shutdown(Shutdown::Both).unwrap();
     }
 
@@ -61,6 +63,7 @@ impl Server {
         });
         let j = serde_json::to_string(&obj).unwrap() + "\n";
         sock.write(j.as_bytes())?;
+        sock.flush();
         let mut buf: [u8; BUFSIZE] = [0; BUFSIZE];
         sock.read(&mut buf)?;
         let s = std::str::from_utf8(&mut buf)?;
@@ -86,7 +89,8 @@ impl Server {
                     player.id=o.id;
                 }
             },
-            _=>{println!("Cannot update player")}
+            _=>{}
+            // _=>{println!("Cannot update player")}
         }
     }
 }
