@@ -162,7 +162,7 @@ impl State for Title {
             .zip(_game.textures.iter())
             .zip(_game.anim_state.iter())
         {
-            screen.bitblt(tex, anim.frame(), player.1.pos);
+            screen.bitblt(&_game.textures[0], _game.anim_state[0].frame(), player.1.pos);
         }
     }
 }
