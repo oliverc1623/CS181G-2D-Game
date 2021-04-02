@@ -1,24 +1,24 @@
 use std::path::Path;
 use std::rc::Rc;
+use std::collections::HashMap;
 
 use fontdue::layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle};
 use fontdue::Font;
 
 use winit::dpi::LogicalSize;
-use winit::event::VirtualKeyCode;
+
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
 
 use Game2DEngine::animation::*;
-use Game2DEngine::collision::*;
 use Game2DEngine::graphics::Screen;
 use Game2DEngine::tiles::*;
 use Game2DEngine::types::*;
 // Imagine a Resources struct (we'll call it AssetDB or Assets in the future)
 // which wraps all accesses to textures, sounds, animations, etc.
 use Game2DEngine::resources::*;
-use Game2DEngine::texture::Texture;
 use Game2DEngine::states::*;
+use Game2DEngine::server::{Server};
 
 const WIDTH: usize = 320*2;
 const HEIGHT: usize = 240*2;
@@ -115,7 +115,7 @@ fn main() {
                 ],
             )],
             // Initial entities on level start
-            vec![(Player::new(), 15, 29)], // TODO: add three other player types
+            vec![(Player::new(), 15, 29), (Player::new(), 9, 6), (Player::new(), 10, 5), (Player::new(), 11, 6)], 
         ),
         ( // level 1 is the overworld map
             // The map
@@ -344,7 +344,7 @@ fn main() {
                     ],
                 )],
             // Initial entities on level start
-            vec![(Player::new(), 10, 6)],
+            vec![(Player::new(), 10, 6), (Player::new(), 9, 6), (Player::new(), 10, 5), (Player::new(), 11, 6)],
         ),
     ];
     let player_tex = rsrc.load_texture(Path::new("content/wiry_all_side.png"));
@@ -376,12 +376,7 @@ fn main() {
         w: 32,
         h: 32,
     }));
-    let overworld_player_tex = rsrc.load_texture(Path::new("content/wiry_all.png"));
-
-    // flipping sprites: 1) take sprite sheet and copy sprite and flip
-    // 2) when load image, make flipped version of spritesheet
-    // 3) add parameter to bitblit: scale negative values to x/y direction and bool for flipped
-    //    copy col 0 to col w and col 1 to col w-1. play around with row.b variables. 
+    let overworld_player_tex = rsrc.load_texture(Path::new("content/wiry_all_side.png"));
     let overworld_player_anim = Rc::new(Animation::new(
         vec![
             (Rect {
@@ -407,18 +402,19 @@ fn main() {
     // And here's our game state, which is just stuff that changes.
     // We'll say an entity is a type, a position, a velocity, a size, a texture, and an animation state.
     // State here will stitch them all together.
+
+    let mut server=Server::new();
+    server.connect("45.10.152.68:16512");
+    let mut player=Player::new();
+    player.id=server.id;
+    let mut players=HashMap::<i32,Player>::new();
+    players.entry(player.id).or_insert(player);
+
     let mut game = GameState {
         // Every entity has a position, a size, a texture, and animation state.
         // Assume entity 0 is the player
-        types: vec![
-            // In a real example we'd provide nicer accessors than this
-            levels[0].1[0].0,
-            // levels[0].1[1].0,
-        ],
-        positions: vec![
-            Vec2i(levels[0].1[0].1 * 16, levels[0].1[0].2 * 16), // player pos
-        ],
-        velocities: vec![Vec2i(0, 0)],
+        server,
+        players,
         sizes: vec![(32, 32)],
         // Could be texture handles instead, let's talk about that in two weeks
         textures: vec![Rc::clone(&player_tex), Rc::clone(&enemy_tex), Rc::clone(&background_tex), Rc::clone(&overworld_player_tex)],

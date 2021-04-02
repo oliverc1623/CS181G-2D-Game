@@ -95,7 +95,6 @@ pub fn gather_contacts(
             h: size.1 as u16,
         };
         if ttl.solid {
-            println!("touching top left");
             if let Some(displacement) = rect_displacement(sprite_rect, tlrect) {
                 // make contact out of displacment
                 // define contact
@@ -107,7 +106,6 @@ pub fn gather_contacts(
             }
         }
         if ttr.solid {
-            println!("touching top right");
             if let Some(displacement) = rect_displacement(sprite_rect, trrect) {
                 // make contact out of displacment
                 // define contact
@@ -119,7 +117,6 @@ pub fn gather_contacts(
             }
         }
         if btl.solid {
-            println!("touching bottom left");
             if let Some(displacement) = rect_displacement(sprite_rect, blrect) {
                 // make contact out of displacment
                 // define contact
@@ -131,7 +128,6 @@ pub fn gather_contacts(
             }
         }
         if btr.solid {
-            println!("touching buttom right");
             if let Some(displacement) = rect_displacement(sprite_rect, brrect) {
                 // make contact out of displacment
                 // define contact
@@ -207,11 +203,9 @@ pub fn restitute(
                 }
                 if horizontal_mtv < vertical_mtv {
                     if a_rect.x < b_rect.x {
-                        println!("Box touched left side{:?}", c);
                         a_rect.x -= horizontal_mtv;
                     // disp[player_indx] = (horizontal_mtv, 0)
                     } else {
-                        println!("Box touched right side{:?}", c);
                         a_rect.x += horizontal_mtv;
                         // disp[player_indx] = (horizontal_mtv, 0)
                     }

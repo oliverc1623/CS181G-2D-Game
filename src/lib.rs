@@ -21,6 +21,7 @@ pub mod collision;
 pub mod texture;
 pub mod tiles;
 pub mod states;
+pub mod server;
 
 const DEPTH: usize = 4;
 const DT: f64 = 1.0 / 60.0;

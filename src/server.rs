@@ -4,6 +4,8 @@ use std::io::{Read, Write, Stderr};
 use std;
 use std::str::FromStr;
 use serde::{Deserialize, Serialize};
+use crate::states::GameState;
+use std::collections::HashMap;
 
 const BUFSIZE: usize = 4096;
 
@@ -48,7 +50,7 @@ impl Server {
         sock.shutdown(Shutdown::Both).unwrap();
     }
 
-    pub fn update(self, player: &Player) -> Result<Vec<Player>, Box<dyn std::error::Error>> {
+    fn update(&self, player: &Player) -> Result<Vec<Player>, Box<dyn std::error::Error>> {
         if !self.connected {
             return Ok(Vec::<Player>::new()); // empty vec
         }
@@ -64,11 +66,27 @@ impl Server {
         let s = std::str::from_utf8(&mut buf)?;
         if let Some(term) = s.find("\n") {
             let v: Vec<Player> = serde_json::from_str(&s[..term])?;
-            println!("{}", s);
+            println!("Recved from server: {}", s);
             Ok(v)
         } else {
             Ok(Vec::<Player>::new())
             // this is not ok but i can't get rust to throw something sensible
+        }
+    }
+
+    pub fn update_game(&self, players:&mut HashMap<i32,Player>){
+        let response=self.update(&players[&self.id]);
+        match response{
+            Ok(others)=>{
+                for o in others.into_iter(){
+                    let player=players.entry(o.id).or_insert(Player::new());
+                    player.world=o.world;
+                    player.vel=o.vel;
+                    player.pos=o.pos;
+                    player.id=o.id;
+                }
+            },
+            _=>{println!("Cannot update player")}
         }
     }
 }
