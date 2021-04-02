@@ -422,7 +422,7 @@ fn main() {
         // Current level
         level: 1,
         // Camera position
-        camera: Vec2i(0, 64),
+        camera: Vec2i(0, 0),
         // background position
         background_pos: Vec2i(0,0),
         state_stack: vec![Box::new(Title())],
