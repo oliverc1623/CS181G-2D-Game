@@ -95,7 +95,7 @@ pub fn gather_contacts(
             h: size.1 as u16,
         };
         if ttl.solid {
-            // println!("touching top left");
+            println!("touching top left");
             if let Some(displacement) = rect_displacement(sprite_rect, tlrect) {
                 // make contact out of displacment
                 // define contact
@@ -107,7 +107,7 @@ pub fn gather_contacts(
             }
         }
         if ttr.solid {
-            // println!("touching top right");
+            println!("touching top right");
             if let Some(displacement) = rect_displacement(sprite_rect, trrect) {
                 // make contact out of displacment
                 // define contact
@@ -119,7 +119,7 @@ pub fn gather_contacts(
             }
         }
         if btl.solid {
-            // println!("touching bottom left");
+            println!("touching bottom left");
             if let Some(displacement) = rect_displacement(sprite_rect, blrect) {
                 // make contact out of displacment
                 // define contact
@@ -131,7 +131,7 @@ pub fn gather_contacts(
             }
         }
         if btr.solid {
-            // println!("touching buttom right");
+            println!("touching buttom right");
             if let Some(displacement) = rect_displacement(sprite_rect, brrect) {
                 // make contact out of displacment
                 // define contact
@@ -150,14 +150,14 @@ pub fn gather_contacts(
             // println!("touching top right");
             // println!("jump reset ttr");
         }
-        if btl.solid {
+        if btl.jump_reset {
             // println!("touching bottom left");
-            println!("jump reset btl");
+            // println!("jump reset btl");
             *num_jumps = 0;
         }
-        if btr.solid {
+        if btl.jump_reset {
             // println!("touching buttom right");
-            println!("jump reset btr");
+            // println!("jump reset btr");
             *num_jumps = 0;
         }
     }

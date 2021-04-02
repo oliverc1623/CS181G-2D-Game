@@ -55,8 +55,9 @@ impl Tileset {
         id.0 < self.tiles.len()
     }
 }
-/// An actual tilemap
-// #[derive(Copy)]
+
+pub type Level = (Vec<Tilemap>, Vec<(Player, i32, i32)>);
+
 pub struct Tilemap {
     /// Where the tilemap is in space, use your favorite number type here
     pub position: Vec2i,

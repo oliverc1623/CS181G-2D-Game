@@ -2,19 +2,25 @@ use pixels::{Pixels, SurfaceTexture};
 use winit::platform::run_return::EventLoopExtRunReturn;
 use winit::window::WindowBuilder;
 
+use serde::{Deserialize, Serialize};
+
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit_input_helper::WinitInputHelper;
 pub mod types;
-use types::{Rgba, Vec2i};
+use types::{Rgba, Vec2i, Player};
+
 pub mod graphics;
 use graphics::Screen;
+
 pub mod resources;
 use resources::Resources;
+
 pub mod animation;
 pub mod collision;
 pub mod texture;
 pub mod tiles;
+pub mod states;
 
 const DEPTH: usize = 4;
 const DT: f64 = 1.0 / 60.0;

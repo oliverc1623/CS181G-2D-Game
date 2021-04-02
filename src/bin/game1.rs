@@ -18,6 +18,7 @@ use Game2DEngine::types::*;
 // which wraps all accesses to textures, sounds, animations, etc.
 use Game2DEngine::resources::*;
 use Game2DEngine::texture::Texture;
+use Game2DEngine::states::*;
 
 const WIDTH: usize = 320*2;
 const HEIGHT: usize = 240*2;
@@ -26,312 +27,11 @@ const SIZE: f32 = 20.0;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 enum EntityType {
-    Player,
+    // Player,
     Enemy,
 }
 
-type Level = (Vec<Tilemap>, Vec<(EntityType, i32, i32)>);
-
-struct GameData {
-    score: usize,
-    speed_multiplier: usize,
-    num_jumps: usize,
-}
-
-struct GameState {
-    // Every entity has a position, a size, a texture, and animation state.
-    // Assume entity 0 is the player
-    types: Vec<EntityType>,
-    positions: Vec<Vec2i>,
-    velocities: Vec<Vec2i>,
-    sizes: Vec<(usize, usize)>,
-    textures: Vec<Rc<Texture>>,
-    anim_state: Vec<AnimationState>,
-    // Current level
-    level: usize,
-    // Camera position
-    camera: Vec2i,
-    // background position
-    background_pos: Vec2i,
-    state_stack: Vec<Box<dyn State>>,
-    game_data: GameData,
-}
-
-// Probably should be WinitInputHelper
-type Input = str;
-
-#[derive(Debug)]
-enum StateResult {
-    // Pop this state off the stack, update the one before me
-    Remove,
-    // Keep this state as is, quit propagating updates
-    Keep,
-    // Swap this state for a new one, update the new one too
-    Swap(Box<dyn State>),
-    // Push a new state on top of this one, update it too
-    Push(Box<dyn State>),
-}
-trait State: std::fmt::Debug {
-    fn update(
-        &mut self,
-        game: &mut GameState,
-        // input: &Input,
-        resources: &Resources,
-        levels: &Vec<Level>,
-        frame: usize,
-        key_input: &WinitInputHelper,
-    ) -> StateResult;
-    // Probably needs to take an &Screen, could return a bool if it
-    // wants other states to display too
-    fn display(
-        &self,
-        game: &GameState,
-        resources: &Resources,
-        levels: &Vec<Level>,
-        screen: &mut Screen,
-        frame: usize,
-    );
-}
-
-/*
-Currently using sketch level timemap
-*/
-#[derive(Debug)]
-struct Title();
-impl State for Title {
-    fn update(
-        &mut self,
-        _game: &mut GameState,
-        // input: &Input,
-        resources: &Resources,
-        levels: &Vec<Level>,
-        frame: usize,
-        key_input: &WinitInputHelper,
-    ) -> StateResult {
-        // _game.positions[0] = Vec2i(levels[1].1[0].1 * 16, levels[1].1[0].2 * 16);
-        let max_vel = 20;
-        let min_vel = -20;
-        if key_input.key_held(VirtualKeyCode::Right){
-            // _game.velocities[0].0 = 7;
-            // println!("right vel {:}", _game.velocities[0].0);
-            if _game.velocities[0].0 < max_vel {
-                // println!("inside");
-                _game.velocities[0].0 +=2;
-                // println!("inside {:}", _game.velocities[0].0);
-            }
-            _game.anim_state[0].tick();
-        } else if key_input.key_released(VirtualKeyCode::Right) {
-            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
-            // println!("after {:}", _game.velocities[0].0);
-        }
-        if key_input.key_held(VirtualKeyCode::Left) {
-            if _game.velocities[0].0 > min_vel {
-                // println!("inside");
-                _game.velocities[0].0 -=2;
-                // println!("inside {:}", _game.velocities[0].0);
-            }
-        } else if key_input.key_released(VirtualKeyCode::Left) {
-            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
-        }
-        if key_input.key_held(VirtualKeyCode::Up) {
-            // println!("jumps {:}", _game.game_data.num_jumps);
-            if _game.game_data.num_jumps < 2 {
-                _game.velocities[0].1 = -5;            
-                _game.game_data.num_jumps += 1;
-            }
-        } else if key_input.key_released(VirtualKeyCode::Up) {
-            _game.velocities[0].1 /= 2;
-            _game.velocities[0].1 = 2;            
-        }
-        if key_input.key_held(VirtualKeyCode::Down) {
-            if _game.velocities[0].1 < max_vel {
-                _game.velocities[0].1 +=2;
-                // println!("inside {:}", _game.velocities[0].0);
-            }
-        } else if key_input.key_released(VirtualKeyCode::Down) {
-            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
-        }
-
-        if key_input.key_held(VirtualKeyCode::P) {
-            // println!("hitting p");
-            StateResult::Swap(Box::new(Scroll()))
-        } else {
-            StateResult::Keep
-        }
-    }
-    fn display(
-        &self,
-        _game: &GameState,
-        resources: &Resources,
-        levels: &Vec<Level>,
-        screen: &mut Screen,
-        frame: usize,
-    ) {
-        // println!("Title: p to play");
-        screen.clear(Rgba(211, 211, 211, 255));
-        screen.set_scroll(_game.camera);
-        // levels[_game.level].0.draw(screen);
-        let maps = &levels[1].0;
-        for map in maps {
-            map.draw(screen);
-        }
-        for ((pos, tex), anim) in _game
-            .positions
-            .iter()
-            .zip(_game.textures.iter())
-            .zip(_game.anim_state.iter())
-        {
-            screen.bitblt(tex, anim.frame(), *pos);
-        }
-    }
-}
-#[derive(Debug)]
-struct Scroll();
-impl State for Scroll {
-    fn update(
-        &mut self,
-        _game: &mut GameState,
-        resources: &Resources,
-        levels: &Vec<Level>,
-        frame: usize,
-        key_input: &WinitInputHelper,
-    ) -> StateResult {
-        _game.level = 0;
-        // StateResult::Keep
-        let max_vel = 20;
-        let min_vel = -20;
-        // println!("before {:}", _game.velocities[0].0);
-        if key_input.key_held(VirtualKeyCode::Right){
-            // _game.velocities[0].0 = 7;
-            // println!("right vel {:}", _game.velocities[0].0);
-            if _game.velocities[0].0 < max_vel {
-                // println!("inside");
-                _game.velocities[0].0 +=2;
-                // println!("inside {:}", _game.velocities[0].0);
-            }
-            _game.anim_state[0].tick();
-        } else if key_input.key_released(VirtualKeyCode::Right) {
-            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
-            // println!("after {:}", _game.velocities[0].0);
-        }
-        if key_input.key_held(VirtualKeyCode::Left) {
-            if _game.velocities[0].0 > min_vel {
-                // println!("inside");
-                _game.velocities[0].0 -=2;
-                // println!("inside {:}", _game.velocities[0].0);
-            }
-        } else if key_input.key_released(VirtualKeyCode::Left) {
-            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
-        }
-        if key_input.key_held(VirtualKeyCode::Up) {
-            println!("jumps {:}", _game.game_data.num_jumps);
-            if _game.game_data.num_jumps < 2 {
-                _game.velocities[0].1 = -5;            
-                _game.game_data.num_jumps += 1;
-            }
-        } else if key_input.key_released(VirtualKeyCode::Up) {
-            _game.velocities[0].1 /= 2;
-            _game.velocities[0].1 = 2;            
-        }
-        if key_input.key_held(VirtualKeyCode::Down) {
-            if _game.velocities[0].1 < max_vel {
-                println!("inside");
-                _game.velocities[0].1 +=2;
-                // println!("inside {:}", _game.velocities[0].0);
-            }
-        } else if key_input.key_released(VirtualKeyCode::Down) {
-            _game.velocities[0].0 = (_game.velocities[0].0 as f32 * 0.25) as i32;
-        }
-        // Determine enemy velocity
-        // Update all entities' positions
-        // let speed_multiplier = _game.game_data.speed_multiplier;
-        for (posn, vel) in _game.positions.iter_mut().zip(_game.velocities.iter()) {
-            posn.0 += vel.0;
-            posn.1 += vel.1;
-        }
-        // reset number of jumps
-        // Detect collisions: Convert positions and sizes to collision bodies, generate contacts
-        // Outline of a possible approach to tile collision:
-        let mut contacts = vec![];
-        gather_contacts(
-            &_game.positions,
-            &_game.sizes,
-            &[&levels[_game.level].0[0]],
-            &mut contacts,
-            &mut _game.game_data.num_jumps,
-        );
-        restitute(
-            &mut _game.positions,
-            &_game.sizes,
-            &mut _game.velocities,
-            &mut _game.camera,
-            &[&levels[_game.level].0[0]],
-            &mut contacts,
-        );
-
-        // update camera after restitution
-        _game.camera.0 += _game.velocities[0].0;
-        _game.background_pos.0 += -1*_game.velocities[0].0;
-        // _game.camera.1 += _game.velocities[0].1;
-        // update tilemap after restitution    
-        // _game.camera.1 += _game.velocities[0].1;
-
-        if key_input.key_held(VirtualKeyCode::X) {
-            StateResult::Remove
-        } else {
-            StateResult::Keep
-        }
-    }
-    fn display(
-        &self,
-        _game: &GameState,
-        resources: &Resources,
-        levels: &Vec<Level>,
-        screen: &mut Screen,
-        frame: usize,
-    ) {
-        // println!("Title: p to play");
-        // screen.clear(Rgba(80, 80, 80, 255));
-        screen.bitblt(&_game.textures[2], Rect{x: 0, y: 0, w: WIDTH as u16, h:HEIGHT as u16}, _game.background_pos);
-        screen.set_scroll(_game.camera);
-        // let x = levels[0].0[0];
-        levels[_game.level].0[0].draw(screen); //levels[0].0
-        for ((pos, tex), anim) in _game
-            .positions
-            .iter()
-            .zip(_game.textures.iter())
-            .zip(_game.anim_state.iter())
-        {
-            screen.bitblt(tex, anim.frame(), *pos);
-        }
-    }
-}
-
-fn process_input(
-    game: &mut GameState,
-    // input: &Input,
-    resources: &Resources,
-    levels: &Vec<Level>,
-    frame: usize,
-    key_input: &WinitInputHelper,
-) {
-    let mut this_state = game.state_stack.pop().unwrap();
-    // println!("input {:?} on state {:?}", this_state);
-    match this_state.update(game, resources, levels, frame, key_input) {
-        StateResult::Remove => process_input(game, resources, levels, frame, key_input),
-        StateResult::Keep => game.state_stack.push(this_state),
-        StateResult::Push(new_state) => {
-            game.state_stack.push(this_state);
-            game.state_stack.push(new_state);
-            process_input(game, resources, levels, frame, key_input);
-        }
-        StateResult::Swap(new_state) => {
-            game.state_stack.push(new_state);
-            process_input(game, resources, levels, frame, key_input);
-        }
-    }
-}
-
+// type Level = (Vec<Tilemap>, Vec<(EntityType, i32, i32)>);
 fn main() {
     let window_builder = {
         let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
@@ -349,19 +49,38 @@ fn main() {
             Tile { solid: false,  jump_reset: false }, // 1
             Tile { solid: false,  jump_reset: false  }, // 2
             Tile { solid: false,  jump_reset: false  }, // 3
-            Tile { solid: true,  jump_reset: false  },  // 4
-            Tile { solid: true,  jump_reset: false  },  // 5
+            Tile { solid: false,  jump_reset: false  },  // 4
+            Tile { solid: false,  jump_reset: false  },  // 5
             Tile { solid: false ,  jump_reset: false }, // 6
-            Tile { solid: true,  jump_reset: false  },  // 7
+            Tile { solid: false,  jump_reset: false  },  // 7
             Tile { solid: true,  jump_reset: true  },  // 8 stone
             Tile { solid: false,  jump_reset: false  },  // 9
-            Tile { solid: true,  jump_reset: false  },  // 10
-            Tile { solid: true ,  jump_reset: false },  // 11
+            Tile { solid: false,  jump_reset: false  },  // 10
+            Tile { solid: false ,  jump_reset: false },  // 11
             Tile { solid: false,  jump_reset: false  }, // 12
             Tile { solid: false,  jump_reset: false  }, // 13
             Tile { solid: false,  jump_reset: false  }, // 14
             Tile { solid: false,  jump_reset: false  }, // 15
             Tile { solid: false,  jump_reset: false  },
+        ],
+        &rsrc.load_texture(Path::new("content/tilesheet.png")),
+    ));
+    // overworld tileset
+    let overworld_tileset = Rc::new(Tileset::new(
+        vec![
+            Tile { solid: true, jump_reset: false },
+            Tile { solid: false, jump_reset: false },
+            Tile { solid: true, jump_reset: false },
+            Tile { solid: false, jump_reset: false },
+            Tile { solid: false, jump_reset: false },
+            Tile { solid: false, jump_reset: false },
+            Tile { solid: false, jump_reset: false },
+            Tile { solid: false, jump_reset: false },
+            Tile { solid: false, jump_reset: false },
+            Tile { solid: false, jump_reset: false },
+            Tile { solid: true, jump_reset: false },
+            Tile { solid: false, jump_reset: false },
+            Tile { solid: true, jump_reset: false },
         ],
         &rsrc.load_texture(Path::new("content/tilesheet.png")),
     ));
@@ -396,14 +115,14 @@ fn main() {
                 ],
             )],
             // Initial entities on level start
-            vec![(EntityType::Player, 15, 29)], // TODO: add three other player types
+            vec![(Player::new(), 15, 29)], // TODO: add three other player types
         ),
         ( // level 1 is the overworld map
             // The map
             vec![Tilemap::new(// tilemap 1
                 Vec2i(0, 0),
                 (8, 8),
-                &tileset,
+                &overworld_tileset,
                 vec![
                     8, 8, 8, 8, 8, 8, 8, 8,
                     8, 8, 8, 8, 8, 8, 5, 8,
@@ -416,7 +135,7 @@ fn main() {
                 ]), Tilemap::new(// tilemap 2
                     Vec2i(256, 0),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 0, 8, 8, 8, 8, 8,
                         8, 8, 0, 8, 8, 8, 5, 8,
@@ -430,7 +149,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 3
                     Vec2i(0, 256),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 0, 8, 8, 8, 8, 8,
                         8, 12, 0, 8, 8, 7, 8, 8,
@@ -444,7 +163,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 4
                     Vec2i(256, 256),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 8, 8, 8, 8, 8, 8,
                         8, 8, 8, 8, 8, 8, 8, 8,
@@ -458,7 +177,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 5
                     Vec2i(0, 256 * 2),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 8, 8, 8, 8, 8, 8,
                         8, 8, 8, 8, 8, 8, 5, 8,
@@ -472,7 +191,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 6
                     Vec2i(0, 256 * 3),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 0, 8, 8, 8, 8, 8,
                         8, 8, 0, 8, 8, 8, 5, 8,
@@ -486,7 +205,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 7
                     Vec2i(256, 256 * 2),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 0, 8, 8, 8, 8, 8,
                         8, 12, 0, 8, 8, 7, 8, 8,
@@ -500,7 +219,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 8
                     Vec2i(256, 256 * 3),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 8, 8, 8, 8, 8, 8,
                         8, 8, 8, 8, 8, 8, 8, 8,
@@ -514,7 +233,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 9
                     Vec2i(256 * 2, 0),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 8, 8, 8, 8, 8, 8,
                         8, 8, 8, 8, 8, 8, 5, 8,
@@ -528,7 +247,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 10
                     Vec2i(256 * 2, 256),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 0, 8, 8, 8, 8, 8,
                         8, 8, 0, 8, 8, 8, 5, 8,
@@ -542,7 +261,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 11
                     Vec2i(256 * 2, 256 * 2),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 0, 8, 8, 8, 8, 8,
                         8, 12, 0, 8, 8, 7, 8, 8,
@@ -556,7 +275,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 12
                     Vec2i(256 * 2, 256 * 3),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 8, 8, 8, 8, 8, 8,
                         8, 8, 8, 8, 8, 8, 8, 8,
@@ -570,7 +289,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 13
                     Vec2i(256 * 3, 0),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 8, 8, 8, 8, 8, 8,
                         8, 8, 8, 8, 8, 8, 5, 8,
@@ -584,7 +303,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 14
                     Vec2i(256 * 3, 256),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 0, 8, 8, 8, 8, 8,
                         8, 8, 0, 8, 8, 8, 5, 8,
@@ -598,7 +317,7 @@ fn main() {
                 ), Tilemap::new(// tilemap 15
                     Vec2i(256 * 3, 256 * 2),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 0, 8, 8, 8, 8, 8,
                         8, 12, 0, 8, 8, 7, 8, 8,
@@ -612,7 +331,7 @@ fn main() {
                 ), Tilemap::new( // tilemap 16
                     Vec2i(256 * 3, 256 * 3),
                     (8, 8),
-                    &tileset,
+                    &overworld_tileset,
                     vec![
                         8, 8, 8, 8, 8, 8, 8, 8,
                         8, 8, 8, 8, 8, 8, 8, 8,
@@ -625,7 +344,7 @@ fn main() {
                     ],
                 )],
             // Initial entities on level start
-            vec![(EntityType::Player, 10, 6)],
+            vec![(Player::new(), 10, 6)],
         ),
     ];
     let player_tex = rsrc.load_texture(Path::new("content/wiry_all_side.png"));
@@ -658,6 +377,11 @@ fn main() {
         h: 32,
     }));
     let overworld_player_tex = rsrc.load_texture(Path::new("content/wiry_all.png"));
+
+    // flipping sprites: 1) take sprite sheet and copy sprite and flip
+    // 2) when load image, make flipped version of spritesheet
+    // 3) add parameter to bitblit: scale negative values to x/y direction and bool for flipped
+    //    copy col 0 to col w and col 1 to col w-1. play around with row.b variables. 
     let overworld_player_anim = Rc::new(Animation::new(
         vec![
             (Rect {
@@ -679,7 +403,7 @@ fn main() {
                 h: 32,
             }, 8),
         ],  true));
-    let background_tex = rsrc.load_texture(Path::new("C:/Users/Oliver Chang/Documents/cs181g/Game2DEngine/content/badland_background.png"));
+    let background_tex = rsrc.load_texture(Path::new("content/badland_background.png"));
     // And here's our game state, which is just stuff that changes.
     // We'll say an entity is a type, a position, a velocity, a size, a texture, and an animation state.
     // State here will stitch them all together.
@@ -711,9 +435,7 @@ fn main() {
             speed_multiplier: 1,
             num_jumps: 0,
         },
-    };
-
-    
+    };    
 
     Game2DEngine::run(
         WIDTH,
