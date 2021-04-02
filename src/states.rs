@@ -96,23 +96,24 @@ impl State for Title {
         key_input: &WinitInputHelper,
     ) -> StateResult {
         // _game.positions[0] = Vec2i(levels[1].1[0].1 * 16, levels[1].1[0].2 * 16);
-
+        let max_vel = 20;
+        let min_vel = -20;
         if key_input.key_held(VirtualKeyCode::Right){
-            _game.players.get_mut(&_game.server.id).unwrap().vel.0 = 2;
+            _game.players.get_mut(&_game.server.id).unwrap().pos.0 += 2;
             // _game.anim_state[0].tick();
         } 
         if key_input.key_held(VirtualKeyCode::Left) {
-            _game.players.get_mut(&_game.server.id).unwrap().vel.0 = -2;
+            _game.players.get_mut(&_game.server.id).unwrap().pos.0 += -2;
         } 
         if key_input.key_held(VirtualKeyCode::Up) {
-            _game.players.get_mut(&_game.server.id).unwrap().vel.1 = -2;
+            _game.players.get_mut(&_game.server.id).unwrap().pos.1 += -2;
         } 
         if key_input.key_held(VirtualKeyCode::Down) {
-            _game.players.get_mut(&_game.server.id).unwrap().vel.1 = 2;
+            _game.players.get_mut(&_game.server.id).unwrap().pos.1 += 2;
         } 
         // update current player pos
-        _game.players.get_mut(&_game.server.id).unwrap().pos.0 = _game.players.get_mut(&_game.server.id).unwrap().vel.0;
-        _game.players.get_mut(&_game.server.id).unwrap().pos.1 = _game.players.get_mut(&_game.server.id).unwrap().vel.1;
+        // _game.players.get_mut(&_game.server.id).unwrap().pos.0 = _game.players.get_mut(&_game.server.id).unwrap().vel.0;
+        // _game.players.get_mut(&_game.server.id).unwrap().pos.1 = _game.players.get_mut(&_game.server.id).unwrap().vel.1;
 
         _game.server.update_game(&mut _game.players);
 
@@ -122,8 +123,8 @@ impl State for Title {
         // }
 
         // update camera after restitution
-        _game.camera.0 += _game.players.get_mut(&_game.server.id).unwrap().vel.0;
-        _game.camera.0 += _game.players.get_mut(&_game.server.id).unwrap().vel.1;
+        _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH/2) as i32;
+        _game.camera.1 = _game.players[&_game.server.id].pos.1 - (HEIGHT/2) as i32;
         // _game.background_pos.0 += -1*_game.velocities[0].0;
 
         if key_input.key_held(VirtualKeyCode::P) {
@@ -151,16 +152,17 @@ impl State for Title {
         }
         // draw main player        
         let curpos = _game.players[&_game.server.id].pos;
-        screen.bitblt(&_game.textures[3], _game.anim_state[2].frame(), curpos);
+        // println!("player pos {:?}", &_game.textures[1].image);
+        screen.bitblt(&_game.textures[0], _game.anim_state[0].frame(), curpos);
         // draw positions of other players
-        for ((player, tex), anim) in _game
-            .players
-            .iter()
-            .zip(_game.textures.iter())
-            .zip(_game.anim_state.iter())
-        {
-            screen.bitblt(tex, anim.frame(), player.1.pos);
-        }
+        // for ((player, tex), anim) in _game
+        //     .players
+        //     .iter()
+        //     .zip(_game.textures.iter())
+        //     .zip(_game.anim_state.iter())
+        // {
+        //     screen.bitblt(tex, anim.frame(), player.1.pos);
+        // }
     }
 }
 #[derive(Debug)]

@@ -69,7 +69,7 @@ impl Server {
         let s = std::str::from_utf8(&mut buf)?;
         if let Some(term) = s.find("\n") {
             let v: Vec<Player> = serde_json::from_str(&s[..term])?;
-            println!("Recved from server: {}", s);
+            // println!("Recved from server: {}", s);
             Ok(v)
         } else {
             Ok(Vec::<Player>::new())

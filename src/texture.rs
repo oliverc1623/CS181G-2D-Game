@@ -3,7 +3,7 @@ use image::{self, RgbaImage};
 use std::path::Path;
 
 pub struct Texture {
-    image: Vec<u8>,
+    pub image: Vec<u8>,
     width: usize,
     height: usize,
     depth: usize,
