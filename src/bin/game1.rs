@@ -410,6 +410,9 @@ fn main() {
     let mut players=HashMap::<i32,Player>::new();
     players.entry(player.id).or_insert(player);
 
+    let mut map_x_boundary = 1024 as i32;
+    let mut map_y_boundary = 1024 as i32;
+
     let mut game = GameState {
         // Every entity has a position, a size, a texture, and animation state.
         // Assume entity 0 is the player
@@ -431,6 +434,8 @@ fn main() {
             speed_multiplier: 1,
             num_jumps: 0,
         },
+        map_x_boundary,
+        map_y_boundary,
     };    
 
     Game2DEngine::run(

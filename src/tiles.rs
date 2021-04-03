@@ -1,7 +1,7 @@
 use crate::graphics::Screen;
 use crate::texture::Texture;
 use crate::types::*;
-
+use rand::Rng;
 use std::rc::Rc;
 
 pub const TILE_SZ: usize = 32;
@@ -53,6 +53,27 @@ impl Tileset {
     }
     fn contains(&self, id: TileID) -> bool {
         id.0 < self.tiles.len()
+    }
+
+    pub fn create_map(tileset: &Rc<Tileset>, psn: Vec2i) -> Tilemap {
+        let mut rng = rand::thread_rng();
+        let mut tiles:Vec<usize> = vec![]; 
+        let mut n: usize = rng.gen_range(0..50); 
+        for i in 0..64 {
+            if n <= 12 {
+                tiles.push(n);
+            } else {
+                tiles.push(8); 
+            }
+            n = rng.gen_range(0..50); 
+        } 
+        let map = Tilemap::new(
+            psn,
+            (8, 8),
+            &tileset,
+            tiles,
+        );
+        return map; 
     }
 }
 

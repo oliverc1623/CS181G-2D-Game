@@ -42,6 +42,8 @@ pub struct GameState {
     pub background_pos: Vec2i,
     pub state_stack: Vec<Box<dyn State>>,
     pub game_data: GameData,
+    pub map_x_boundary: i32,
+    pub map_y_boundary: i32,
 }
 
 // Probably should be WinitInputHelper
@@ -100,7 +102,17 @@ impl State for Title {
         let min_vel = -20;
         if key_input.key_held(VirtualKeyCode::Right){
             _game.players.get_mut(&_game.server.id).unwrap().pos.0 += 2;
-            // _game.anim_state[0].tick();
+            // if _game.camera.0 >= (_game.map_x_boundary - WIDTH as i32) { 
+            //     let mut i: i32 = 0;
+            //     let mut psn: Vec2i = Vec2i(_game.map_x_boundary, 0);  
+            //     while i < _game.map_y_boundary {
+            //         maps.push(Tileset::create_map(tileset, psn));
+            //         psn.1 += TILE_MAP_SIZE as i32;
+            //         i += TILE_MAP_SIZE as i32;
+            //     }
+    
+            //     *map_x_boundary += TILE_MAP_SIZE as i32;
+            // }
         } 
         if key_input.key_held(VirtualKeyCode::Left) {
             _game.players.get_mut(&_game.server.id).unwrap().pos.0 += -2;
@@ -111,16 +123,10 @@ impl State for Title {
         if key_input.key_held(VirtualKeyCode::Down) {
             _game.players.get_mut(&_game.server.id).unwrap().pos.1 += 2;
         } 
-        // update current player pos
-        // _game.players.get_mut(&_game.server.id).unwrap().pos.0 = _game.players.get_mut(&_game.server.id).unwrap().vel.0;
-        // _game.players.get_mut(&_game.server.id).unwrap().pos.1 = _game.players.get_mut(&_game.server.id).unwrap().vel.1;
+
+
 
         _game.server.update_players(&mut _game.players);
-
-        // for posn in _game.other_players.iter_mut() {
-        //     posn.0 += vel.0;
-        //     posn.1 += vel.1;
-        // }
 
         // update camera after restitution
         _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH/2) as i32;
@@ -162,6 +168,7 @@ impl State for Title {
             .zip(_game.textures.iter())
             .zip(_game.anim_state.iter())
         {
+            // println!("drawing character {}", player.0);
             screen.bitblt(&_game.textures[0], _game.anim_state[0].frame(), player.1.pos);
         }
     }
@@ -224,8 +231,8 @@ impl State for Scroll {
         }
         // Update all entities' positions
         // update current player
-        cur_player.pos.0 = cur_player.vel.0;
-        cur_player.pos.1 = cur_player.vel.1;
+        cur_player.pos.0 += cur_player.vel.0;
+        cur_player.pos.1 += cur_player.vel.1;
 
         // for (posn, vel) in _game.positions.iter_mut().zip(_game.velocities.iter()) {
         //     posn.0 += vel.0;
@@ -252,10 +259,16 @@ impl State for Scroll {
             &[&levels[_game.level].0[0]],
             &mut contacts,
         );
-        _game.server.update_players(&mut _game.players);
+        for (((id,p), pos), vel) in _game.players.iter_mut().zip(all_pos.iter()).zip(all_vel.iter()){
+            p.pos = *pos;
+            p.vel = *vel;
+        }
+        // _game.server.update_players(&mut _game.players);
         // update camera after restitution
-        _game.camera.0 += _game.players[&_game.server.id].vel.0;
-        _game.background_pos.0 += -1*_game.players[&_game.server.id].vel.0;
+        // _game.camera.0 += _game.players[&_game.server.id].vel.0;
+        _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH/2) as i32;
+        _game.camera.1 = _game.players[&_game.server.id].pos.1 - (HEIGHT/2) as i32;
+        // _game.background_pos.0 += -1*_game.players[&_game.server.id].vel.0;
         // _game.camera.1 += _game.velocities[0].1;
         // update tilemap after restitution    
         // _game.camera.1 += _game.velocities[0].1;
@@ -288,7 +301,7 @@ impl State for Scroll {
             .zip(_game.textures.iter())
             .zip(_game.anim_state.iter())
         {
-            screen.bitblt(tex, anim.frame(), player.1.pos);
+            screen.bitblt(&_game.textures[0], _game.anim_state[0].frame(), player.1.pos);
         }
     }
 }
