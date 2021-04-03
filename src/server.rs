@@ -1,4 +1,4 @@
-use crate::types::{Vec2i,Player};
+use crate::types::{Vec2i, Player};
 use std::net::{TcpStream, Shutdown};
 use std::io::{Read, Write, Stderr};
 use std;
@@ -12,6 +12,7 @@ const BUFSIZE: usize = 4096;
 pub struct Server {
     pub id: i32,
     sock: Option<TcpStream>,
+    waiting: bool,
     pub connected: bool,
 }
 
@@ -20,6 +21,7 @@ impl Server {
         Server {
             id: -1,
             connected: false,
+            waiting: false,
             sock: None,
         }
     }
@@ -53,7 +55,7 @@ impl Server {
     }
 
     fn update(&self, player: &Player) -> Result<Vec<Player>, Box<dyn std::error::Error>> {
-        if !self.connected {
+        if !self.connected || self.waiting {
             return Ok(Vec::<Player>::new()); // empty vec
         }
         let mut sock = self.sock.as_ref().unwrap();
@@ -69,7 +71,7 @@ impl Server {
         let s = std::str::from_utf8(&mut buf)?;
         if let Some(term) = s.find("\n") {
             let v: Vec<Player> = serde_json::from_str(&s[..term])?;
-            println!("Recved from server: {}", s);
+            println!("Instance {} Recved from server: {}", self.id, s);
             Ok(v)
         } else {
             Ok(Vec::<Player>::new())
@@ -77,19 +79,22 @@ impl Server {
         }
     }
 
-    pub fn update_players(&self, players:&mut HashMap<i32,Player>){
-        let response=self.update(&players[&self.id]);
-        match response{
-            Ok(others)=>{
-                for o in others.into_iter(){
-                    let player=players.entry(o.id).or_insert(Player::new());
-                    player.world=o.world;
-                    player.vel=o.vel;
-                    player.pos=o.pos;
-                    player.id=o.id;
+    pub fn update_players(&mut self, players: &mut HashMap<i32, Player>) {
+        let response = self.update(&players[&self.id]);
+        match response {
+            Ok(others) => {
+                self.waiting = false;
+                for o in others.into_iter() {
+                    let player = players.entry(o.id).or_insert(Player::new());
+                    player.world = o.world;
+                    player.vel = o.vel;
+                    player.pos = o.pos;
+                    player.id = o.id;
                 }
-            },
-            _=>{}
+            }
+            _ => {
+                self.waiting = true;
+            }
             // _=>{println!("Cannot update player")}
         }
     }
