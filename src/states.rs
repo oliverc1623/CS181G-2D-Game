@@ -15,6 +15,7 @@ use crate::server::{Server};
 const WIDTH: usize = 320*2;
 const HEIGHT: usize = 240*2;
 const TILE_MAP_SIZE: usize = 256;
+const TILE_SZ: usize = 32;
 
 pub struct GameData {
     pub score: usize,
@@ -105,6 +106,10 @@ impl State for Title {
         let min_vel = -20;
         if key_input.key_held(VirtualKeyCode::Right){
             _game.players.get_mut(&_game.server.id).unwrap().pos.0 += 5;
+            if _game.players[&_game.server.id].pos.0 > (TILE_MAP_SIZE - TILE_SZ) as i32 {
+                _game.camera.0 += 5; 
+            }
+            // generate tile map
             if _game.camera.0 >= (_game.map_x_boundary - WIDTH as i32) { 
                 let mut i: i32 = 0;
                 let mut psn: Vec2i = Vec2i(_game.map_x_boundary, 0);  
@@ -117,14 +122,26 @@ impl State for Title {
             }
         } 
         if key_input.key_held(VirtualKeyCode::Left) {
-            _game.players.get_mut(&_game.server.id).unwrap().pos.0 += -2;
+            if _game.players[&_game.server.id].pos.0 > 0 {
+                _game.players.get_mut(&_game.server.id).unwrap().pos.0 += -2;
+            } 
+            if _game.camera.0 > 0 {
+                _game.camera.0 -= 2; 
+            }
         } 
         if key_input.key_held(VirtualKeyCode::Up) {
-            _game.players.get_mut(&_game.server.id).unwrap().pos.1 += -2;
+            if _game.players[&_game.server.id].pos.1 > 0 {
+                _game.players.get_mut(&_game.server.id).unwrap().pos.1 += -2;        
+            } 
+            if _game.camera.1 > 0{
+                _game.camera.1 -= 2;
+            }
         } 
         if key_input.key_held(VirtualKeyCode::Down) {
             _game.players.get_mut(&_game.server.id).unwrap().pos.1 += 7;
-
+            if _game.players[&_game.server.id].pos.1 > (TILE_MAP_SIZE - TILE_SZ) as i32 {
+                _game.camera.1 += 7; 
+            } 
             if _game.camera.1 >= (_game.map_y_boundary - HEIGHT as i32) { 
                 let mut i: i32 = 0;
                 let mut psn: Vec2i = Vec2i(0, _game.map_y_boundary);  
@@ -140,8 +157,8 @@ impl State for Title {
         _game.server.update_players(&mut _game.players);
 
         // update camera after restitution
-        _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH/2) as i32;
-        _game.camera.1 = _game.players[&_game.server.id].pos.1 - (HEIGHT/2) as i32;
+        // _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH/2) as i32;
+        // _game.camera.1 = _game.players[&_game.server.id].pos.1 - (HEIGHT/2) as i32;
         // _game.background_pos.0 += -1*_game.velocities[0].0;
 
         if key_input.key_held(VirtualKeyCode::P) {
