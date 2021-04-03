@@ -14,6 +14,7 @@ use crate::server::{Server};
 
 const WIDTH: usize = 320*2;
 const HEIGHT: usize = 240*2;
+const TILE_MAP_SIZE: usize = 256;
 
 pub struct GameData {
     pub score: usize,
@@ -44,6 +45,8 @@ pub struct GameState {
     pub game_data: GameData,
     pub map_x_boundary: i32,
     pub map_y_boundary: i32,
+    pub tt_tileset: Rc<Tileset>,
+    pub maps: Vec<Tilemap>,
 }
 
 // Probably should be WinitInputHelper
@@ -101,18 +104,17 @@ impl State for Title {
         let max_vel = 20;
         let min_vel = -20;
         if key_input.key_held(VirtualKeyCode::Right){
-            _game.players.get_mut(&_game.server.id).unwrap().pos.0 += 2;
-            // if _game.camera.0 >= (_game.map_x_boundary - WIDTH as i32) { 
-            //     let mut i: i32 = 0;
-            //     let mut psn: Vec2i = Vec2i(_game.map_x_boundary, 0);  
-            //     while i < _game.map_y_boundary {
-            //         maps.push(Tileset::create_map(tileset, psn));
-            //         psn.1 += TILE_MAP_SIZE as i32;
-            //         i += TILE_MAP_SIZE as i32;
-            //     }
-    
-            //     *map_x_boundary += TILE_MAP_SIZE as i32;
-            // }
+            _game.players.get_mut(&_game.server.id).unwrap().pos.0 += 5;
+            if _game.camera.0 >= (_game.map_x_boundary - WIDTH as i32) { 
+                let mut i: i32 = 0;
+                let mut psn: Vec2i = Vec2i(_game.map_x_boundary, 0);  
+                while i < _game.map_y_boundary {
+                    _game.maps.push(Tileset::create_map(&_game.tt_tileset, psn));
+                    psn.1 += TILE_MAP_SIZE as i32;
+                    i += TILE_MAP_SIZE as i32;
+                }
+                _game.map_x_boundary  += TILE_MAP_SIZE as i32;
+            }
         } 
         if key_input.key_held(VirtualKeyCode::Left) {
             _game.players.get_mut(&_game.server.id).unwrap().pos.0 += -2;
@@ -121,10 +123,19 @@ impl State for Title {
             _game.players.get_mut(&_game.server.id).unwrap().pos.1 += -2;
         } 
         if key_input.key_held(VirtualKeyCode::Down) {
-            _game.players.get_mut(&_game.server.id).unwrap().pos.1 += 2;
+            _game.players.get_mut(&_game.server.id).unwrap().pos.1 += 7;
+
+            if _game.camera.1 >= (_game.map_y_boundary - HEIGHT as i32) { 
+                let mut i: i32 = 0;
+                let mut psn: Vec2i = Vec2i(0, _game.map_y_boundary);  
+                while i < _game.map_x_boundary {
+                    _game.maps.push(Tileset::create_map(&_game.tt_tileset, psn));
+                    psn.0 += TILE_MAP_SIZE as i32;
+                    i += TILE_MAP_SIZE as i32;
+                }
+                _game.map_y_boundary  += TILE_MAP_SIZE as i32;
+            }
         } 
-
-
 
         _game.server.update_players(&mut _game.players);
 
@@ -136,6 +147,7 @@ impl State for Title {
         if key_input.key_held(VirtualKeyCode::P) {
             // println!("hitting p");
             _game.players.get_mut(&_game.server.id).unwrap().world = 1;
+            _game.players.get_mut(&_game.server.id).unwrap().pos = Vec2i(0,0);
             StateResult::Swap(Box::new(Scroll()))
         } else {
             StateResult::Keep
@@ -153,8 +165,8 @@ impl State for Title {
         screen.clear(Rgba(211, 211, 211, 255));
         screen.set_scroll(_game.camera);
         // levels[_game.level].0.draw(screen);
-        let maps = &levels[1].0;
-        for map in maps {
+        // let maps = &levels[1].0;
+        for map in _game.maps.iter() {
             map.draw(screen);
         }
         // draw main player        
