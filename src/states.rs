@@ -163,6 +163,7 @@ impl State for Title {
 
         if key_input.key_held(VirtualKeyCode::P) {
             // println!("hitting p");
+            _game.players.get_mut(&_game.server.id).unwrap().vel = Vec2i(0,0);
             _game.players.get_mut(&_game.server.id).unwrap().world = 1;
             _game.players.get_mut(&_game.server.id).unwrap().pos = Vec2i(0,0);
             StateResult::Swap(Box::new(Scroll()))
@@ -267,8 +268,8 @@ impl State for Scroll {
         //     posn.0 += vel.0;
         //     posn.1 += vel.1;
         // }
-        let mut all_pos: Vec<Vec2i> = _game.players.iter_mut().map(|o| o.1.pos).collect();
-        let mut all_vel: Vec<Vec2i> = _game.players.iter_mut().map(|o| o.1.vel).collect();
+        let mut all_pos: Vec<Vec2i> = vec![cur_player.pos];
+        let mut all_vel: Vec<Vec2i> = vec![cur_player.vel];
         // reset number of jumps
         // Detect collisions: Convert positions and sizes to collision bodies, generate contacts
         // Outline of a possible approach to tile collision:
@@ -288,10 +289,12 @@ impl State for Scroll {
             &[&levels[_game.level].0[0]],
             &mut contacts,
         );
-        for (((id,p), pos), vel) in _game.players.iter_mut().zip(all_pos.iter()).zip(all_vel.iter()){
-            p.pos = *pos;
-            p.vel = *vel;
-        }
+        cur_player.pos = all_pos[0];
+        cur_player.vel = all_vel[0];
+        // for (((id,p), pos), vel) in _game.players.iter_mut().zip(all_pos.iter()).zip(all_vel.iter()){
+        //     p.pos = *pos;
+        //     p.vel = *vel;
+        // }
         // _game.server.update_players(&mut _game.players);
         // update camera after restitution
         // _game.camera.0 += _game.players[&_game.server.id].vel.0;
@@ -304,6 +307,7 @@ impl State for Scroll {
 
         if key_input.key_held(VirtualKeyCode::X) {
             // StateResult::Remove
+            _game.players.get_mut(&_game.server.id).unwrap().vel = Vec2i(0,0);
             _game.players.get_mut(&_game.server.id).unwrap().world = 0;
             StateResult::Swap(Box::new(Title()))
         } else {
