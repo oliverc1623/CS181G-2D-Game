@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::tiles::*;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Player {
@@ -28,7 +28,7 @@ pub struct Rect {
     pub h: u16,
 }
 
-#[derive(PartialEq, Eq, Clone, Copy, Hash, Debug,Deserialize, Serialize)]
+#[derive(PartialEq, Eq, Clone, Copy, Hash, Debug, Deserialize, Serialize)]
 pub struct Vec2i(pub i32, pub i32);
 
 #[derive(PartialEq, Eq, Clone, Copy, Hash, Debug)]

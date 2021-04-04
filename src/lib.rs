@@ -8,7 +8,7 @@ use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit_input_helper::WinitInputHelper;
 pub mod types;
-use types::{Rgba, Vec2i, Player};
+use types::{Player, Rgba, Vec2i};
 
 pub mod graphics;
 use graphics::Screen;
@@ -18,10 +18,10 @@ use resources::Resources;
 
 pub mod animation;
 pub mod collision;
+pub mod server;
+pub mod states;
 pub mod texture;
 pub mod tiles;
-pub mod states;
-pub mod server;
 
 const DEPTH: usize = 4;
 const DT: f64 = 1.0 / 60.0;

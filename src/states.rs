@@ -1,19 +1,19 @@
+use crate::animation::*;
+use crate::collision::*;
+use crate::graphics::*;
+use crate::resources::*;
+use crate::server::Server;
+use crate::texture::*;
 use crate::tiles::*;
 use crate::types::*;
-use crate::texture::*;
+use std::collections::HashMap;
 use std::rc::Rc;
-use crate::animation::*;
-use crate::resources::*;
-use crate::graphics::*;
+use winit::event::VirtualKeyCode;
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
-use winit::event::VirtualKeyCode;
-use crate::collision::*;
-use std::collections::HashMap;
-use crate::server::{Server};
 
-const WIDTH: usize = 320*2;
-const HEIGHT: usize = 240*2;
+const WIDTH: usize = 320 * 2;
+const HEIGHT: usize = 240 * 2;
 const TILE_MAP_SIZE: usize = 256;
 const TILE_SZ: usize = 32;
 
@@ -31,7 +31,7 @@ pub struct GameState {
     // pub velocities: Vec<Vec2i>,
     // pub current_player: Player,
     pub server: Server,
-    pub players: HashMap<i32,Player>,
+    pub players: HashMap<i32, Player>,
     // pub positions: Vec<Vec2i>,
     pub sizes: Vec<(usize, usize)>,
     pub textures: Vec<Rc<Texture>>,
@@ -102,70 +102,90 @@ impl State for Title {
         key_input: &WinitInputHelper,
     ) -> StateResult {
         // _game.positions[0] = Vec2i(levels[1].1[0].1 * 16, levels[1].1[0].2 * 16);
+        let cur_player = _game.players.get_mut(&_game.server.id).unwrap();
         let max_vel = 20;
         let min_vel = -20;
-        if key_input.key_held(VirtualKeyCode::Right){
-            _game.players.get_mut(&_game.server.id).unwrap().pos.0 += 5;
-            if _game.players[&_game.server.id].pos.0 > (TILE_MAP_SIZE - TILE_SZ) as i32 {
-                _game.camera.0 += 5; 
+        if key_input.key_held(VirtualKeyCode::Right) {
+            cur_player.pos.0 += 5;
+            if cur_player.pos.0 > (TILE_MAP_SIZE - TILE_SZ) as i32 {
+                _game.camera.0 += 5;
             }
             // generate tile map
-            if _game.camera.0 >= (_game.map_x_boundary - WIDTH as i32) { 
+            if _game.camera.0 >= (_game.map_x_boundary - WIDTH as i32) {
                 let mut i: i32 = 0;
-                let mut psn: Vec2i = Vec2i(_game.map_x_boundary, 0);  
+                let mut psn: Vec2i = Vec2i(_game.map_x_boundary, 0);
                 while i < _game.map_y_boundary {
                     _game.maps.push(Tileset::create_map(&_game.tt_tileset, psn));
                     psn.1 += TILE_MAP_SIZE as i32;
                     i += TILE_MAP_SIZE as i32;
                 }
-                _game.map_x_boundary  += TILE_MAP_SIZE as i32;
+                _game.map_x_boundary += TILE_MAP_SIZE as i32;
             }
-        } 
+        }
         if key_input.key_held(VirtualKeyCode::Left) {
-            if _game.players[&_game.server.id].pos.0 > 0 {
-                _game.players.get_mut(&_game.server.id).unwrap().pos.0 += -2;
-            } 
+            if cur_player.pos.0 > 0 {
+                cur_player.pos.0 += -7;
+            }
             if _game.camera.0 > 0 {
-                _game.camera.0 -= 2; 
+                _game.camera.0 -= 7;
             }
-        } 
+        }
         if key_input.key_held(VirtualKeyCode::Up) {
-            if _game.players[&_game.server.id].pos.1 > 0 {
-                _game.players.get_mut(&_game.server.id).unwrap().pos.1 += -2;        
-            } 
-            if _game.camera.1 > 0{
-                _game.camera.1 -= 2;
+            if cur_player.pos.1 > 0 {
+                cur_player.pos.1 += -7;
             }
-        } 
+            if _game.camera.1 > 0 {
+                _game.camera.1 -= 7;
+            }
+        }
         if key_input.key_held(VirtualKeyCode::Down) {
-            _game.players.get_mut(&_game.server.id).unwrap().pos.1 += 7;
-            if _game.players[&_game.server.id].pos.1 > (TILE_MAP_SIZE - TILE_SZ) as i32 {
-                _game.camera.1 += 7; 
-            } 
-            if _game.camera.1 >= (_game.map_y_boundary - HEIGHT as i32) { 
+            cur_player.pos.1 += 7;
+            if cur_player.pos.1 > (TILE_MAP_SIZE - TILE_SZ) as i32 {
+                _game.camera.1 += 7;
+            }
+            if _game.camera.1 >= (_game.map_y_boundary - HEIGHT as i32) {
                 let mut i: i32 = 0;
-                let mut psn: Vec2i = Vec2i(0, _game.map_y_boundary);  
+                let mut psn: Vec2i = Vec2i(0, _game.map_y_boundary);
                 while i < _game.map_x_boundary {
                     _game.maps.push(Tileset::create_map(&_game.tt_tileset, psn));
                     psn.0 += TILE_MAP_SIZE as i32;
                     i += TILE_MAP_SIZE as i32;
                 }
-                _game.map_y_boundary  += TILE_MAP_SIZE as i32;
+                _game.map_y_boundary += TILE_MAP_SIZE as i32;
             }
-        } 
+        }
+
+        let mut all_pos: Vec<Vec2i> = vec![cur_player.pos];
+        let mut all_vel: Vec<Vec2i> = vec![cur_player.vel];
+        // reset number of jumps
+        // Detect collisions: Convert positions and sizes to collision bodies, generate contacts
+        // Outline of a possible approach to tile collision:
+        let mut contacts = vec![];
+        gather_contacts(
+            all_pos.as_slice(),
+            &_game.sizes,
+            &_game.maps,
+            &mut contacts,
+            &mut _game.game_data.num_jumps,
+        );
+        restitute(
+            all_pos.as_mut_slice(),
+            &_game.sizes,
+            all_vel.as_mut_slice(),
+            &mut _game.camera,
+            &_game.maps,
+            &mut contacts,
+        );
+        cur_player.pos = all_pos[0];
+        cur_player.vel = all_vel[0];
 
         _game.server.update_players(&mut _game.players);
 
-        // update camera after restitution
-        // _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH/2) as i32;
-        // _game.camera.1 = _game.players[&_game.server.id].pos.1 - (HEIGHT/2) as i32;
-        // _game.background_pos.0 += -1*_game.velocities[0].0;
-
         if key_input.key_held(VirtualKeyCode::P) {
             // println!("hitting p");
-            _game.players.get_mut(&_game.server.id).unwrap().vel = Vec2i(0,0);
+            _game.players.get_mut(&_game.server.id).unwrap().vel = Vec2i(0, 0);
             _game.players.get_mut(&_game.server.id).unwrap().world = 1;
-            _game.players.get_mut(&_game.server.id).unwrap().pos = Vec2i(0,0);
+            _game.players.get_mut(&_game.server.id).unwrap().pos = Vec2i(0, 0);
             StateResult::Swap(Box::new(Scroll()))
         } else {
             StateResult::Keep
@@ -187,7 +207,7 @@ impl State for Title {
         for map in _game.maps.iter() {
             map.draw(screen);
         }
-        // draw main player        
+        // draw main player
         let curpos = _game.players[&_game.server.id].pos;
         // println!("player pos {:?}", &_game.textures[1].image);
         // screen.bitblt(&_game.textures[0], _game.anim_state[0].frame(), curpos);
@@ -199,7 +219,11 @@ impl State for Title {
             .zip(_game.anim_state.iter())
         {
             // println!("drawing character {}", player.0);
-            screen.bitblt(&_game.textures[0], _game.anim_state[0].frame(), player.1.pos);
+            screen.bitblt(
+                &_game.textures[0],
+                _game.anim_state[0].frame(),
+                player.1.pos,
+            );
         }
     }
 }
@@ -220,12 +244,12 @@ impl State for Scroll {
         let max_vel = 20;
         let min_vel = -20;
         // println!("before {:}", _game.velocities[0].0);
-        if key_input.key_held(VirtualKeyCode::Right){
+        if key_input.key_held(VirtualKeyCode::Right) {
             // _game.velocities[0].0 = 7;
             // println!("right vel {:}", _game.velocities[0].0);
             if cur_player.vel.0 < max_vel {
                 // println!("inside");
-                cur_player.vel.0 +=2;
+                cur_player.vel.0 += 2;
                 // println!("inside {:}", _game.velocities[0].0);
             }
             _game.anim_state[0].tick();
@@ -236,7 +260,7 @@ impl State for Scroll {
         if key_input.key_held(VirtualKeyCode::Left) {
             if cur_player.vel.0 > min_vel {
                 // println!("inside");
-                cur_player.vel.0 -=2;
+                cur_player.vel.0 -= 2;
                 // println!("inside {:}", _game.velocities[0].0);
             }
         } else if key_input.key_released(VirtualKeyCode::Left) {
@@ -244,16 +268,16 @@ impl State for Scroll {
         }
         if key_input.key_held(VirtualKeyCode::Up) {
             if _game.game_data.num_jumps < 2 {
-                cur_player.vel.1 = -5;            
+                cur_player.vel.1 = -5;
                 _game.game_data.num_jumps += 1;
             }
         } else if key_input.key_released(VirtualKeyCode::Up) {
             cur_player.vel.1 /= 2;
-            cur_player.vel.1 = 2;            
+            cur_player.vel.1 = 2;
         }
         if key_input.key_held(VirtualKeyCode::Down) {
             if cur_player.vel.1 < max_vel {
-                cur_player.vel.1 +=2;
+                cur_player.vel.1 += 2;
                 // println!("inside {:}", _game.velocities[0].0);
             }
         } else if key_input.key_released(VirtualKeyCode::Down) {
@@ -273,41 +297,37 @@ impl State for Scroll {
         // reset number of jumps
         // Detect collisions: Convert positions and sizes to collision bodies, generate contacts
         // Outline of a possible approach to tile collision:
-        let mut contacts = vec![];
-        gather_contacts(
-            all_pos.as_slice(),                       
-            &_game.sizes,
-            &[&levels[_game.level].0[0]],
-            &mut contacts,
-            &mut _game.game_data.num_jumps,
-        );
-        restitute(
-            all_pos.as_mut_slice(),
-            &_game.sizes,
-            all_vel.as_mut_slice(),
-            &mut _game.camera,
-            &[&levels[_game.level].0[0]],
-            &mut contacts,
-        );
-        cur_player.pos = all_pos[0];
-        cur_player.vel = all_vel[0];
-        // for (((id,p), pos), vel) in _game.players.iter_mut().zip(all_pos.iter()).zip(all_vel.iter()){
-        //     p.pos = *pos;
-        //     p.vel = *vel;
-        // }
+        // let mut contacts = vec![];
+        // gather_contacts(
+        //     all_pos.as_slice(),
+        //     &_game.sizes,
+        //     &[&levels[_game.level].0[0]],
+        //     &mut contacts,
+        //     &mut _game.game_data.num_jumps,
+        // );
+        // restitute(
+        //     all_pos.as_mut_slice(),
+        //     &_game.sizes,
+        //     all_vel.as_mut_slice(),
+        //     &mut _game.camera,
+        //     &[&levels[_game.level].0[0]],
+        //     &mut contacts,
+        // );
+        // cur_player.pos = all_pos[0];
+        // cur_player.vel = all_vel[0];
         // _game.server.update_players(&mut _game.players);
         // update camera after restitution
         // _game.camera.0 += _game.players[&_game.server.id].vel.0;
-        _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH/2) as i32;
-        _game.camera.1 = _game.players[&_game.server.id].pos.1 - (HEIGHT/2) as i32;
+        _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH / 2) as i32;
+        _game.camera.1 = _game.players[&_game.server.id].pos.1 - (HEIGHT / 2) as i32;
         // _game.background_pos.0 += -1*_game.players[&_game.server.id].vel.0;
         // _game.camera.1 += _game.velocities[0].1;
-        // update tilemap after restitution    
+        // update tilemap after restitution
         // _game.camera.1 += _game.velocities[0].1;
 
         if key_input.key_held(VirtualKeyCode::X) {
             // StateResult::Remove
-            _game.players.get_mut(&_game.server.id).unwrap().vel = Vec2i(0,0);
+            _game.players.get_mut(&_game.server.id).unwrap().vel = Vec2i(0, 0);
             _game.players.get_mut(&_game.server.id).unwrap().world = 0;
             StateResult::Swap(Box::new(Title()))
         } else {
@@ -324,7 +344,16 @@ impl State for Scroll {
     ) {
         // println!("Title: p to play");
         // screen.clear(Rgba(80, 80, 80, 255));
-        screen.bitblt(&_game.textures[2], Rect{x: 0, y: 0, w: WIDTH as u16, h:HEIGHT as u16}, _game.background_pos);
+        screen.bitblt(
+            &_game.textures[2],
+            Rect {
+                x: 0,
+                y: 0,
+                w: WIDTH as u16,
+                h: HEIGHT as u16,
+            },
+            _game.background_pos,
+        );
         screen.set_scroll(_game.camera);
         // let x = levels[0].0[0];
         levels[_game.level].0[0].draw(screen); //levels[0].0
@@ -334,7 +363,11 @@ impl State for Scroll {
             .zip(_game.textures.iter())
             .zip(_game.anim_state.iter())
         {
-            screen.bitblt(&_game.textures[0], _game.anim_state[0].frame(), player.1.pos);
+            screen.bitblt(
+                &_game.textures[0],
+                _game.anim_state[0].frame(),
+                player.1.pos,
+            );
         }
     }
 }

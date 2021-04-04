@@ -1,11 +1,11 @@
-use crate::types::{Vec2i, Player};
-use std::net::{TcpStream, Shutdown};
-use std::io::{Read, Write, Stderr};
-use std;
-use std::str::FromStr;
-use serde::{Deserialize, Serialize};
 use crate::states::GameState;
+use crate::types::{Player, Vec2i};
+use serde::{Deserialize, Serialize};
+use std;
 use std::collections::HashMap;
+use std::io::{Read, Stderr, Write};
+use std::net::{Shutdown, TcpStream};
+use std::str::FromStr;
 
 const BUFSIZE: usize = 4096;
 
@@ -94,12 +94,10 @@ impl Server {
             }
             _ => {
                 self.waiting = true;
-            }
-            // _=>{println!("Cannot update player")}
+            } // _=>{println!("Cannot update player")}
         }
     }
 }
-
 
 impl Drop for Server {
     // destructor
@@ -109,5 +107,3 @@ impl Drop for Server {
         }
     }
 }
-
-

@@ -57,23 +57,18 @@ impl Tileset {
 
     pub fn create_map(tileset: &Rc<Tileset>, psn: Vec2i) -> Tilemap {
         let mut rng = rand::thread_rng();
-        let mut tiles:Vec<usize> = vec![]; 
-        let mut n: usize = rng.gen_range(0..50); 
+        let mut tiles: Vec<usize> = vec![];
+        let mut n: usize = rng.gen_range(0..50);
         for i in 0..64 {
             if n <= 12 {
                 tiles.push(n);
             } else {
-                tiles.push(8); 
+                tiles.push(8);
             }
-            n = rng.gen_range(0..50); 
-        } 
-        let map = Tilemap::new(
-            psn,
-            (8, 8),
-            &tileset,
-            tiles,
-        );
-        return map; 
+            n = rng.gen_range(0..50);
+        }
+        let map = Tilemap::new(psn, (8, 8), &tileset, tiles);
+        return map;
     }
 }
 
@@ -109,47 +104,57 @@ impl Tilemap {
         }
     }
 
-    pub fn tile_id_at(&self, Vec2i(x, y): Vec2i) -> TileID {
+    pub fn tile_id_at(&self, Vec2i(x, y): Vec2i) -> Option<TileID> {
         // Translate into map coordinates
         let x = (x - self.position.0) / TILE_SZ as i32; // invert operation to get world coordinates
         let y = (y - self.position.1) / TILE_SZ as i32;
-        assert!(
-            x >= 0 && x < self.dims.0 as i32,
-            "Tile X coordinate {} out of bounds {}",
-            x,
-            self.dims.0
-        );
-        assert!(
-            y >= 0 && y < self.dims.1 as i32,
-            "Tile Y coordinate {} out of bounds {}",
-            y,
-            self.dims.1
-        );
-        self.map[y as usize * self.dims.0 + x as usize]
+        // println!("x {} and y {}", x, y);
+        // println!("map x {} map y {}", self.dims.0, self.dims.1);
+        if (x >= 0 && x < self.dims.0 as i32) && (y >= 0 && y < self.dims.1 as i32) {
+            Some(self.map[y as usize * self.dims.0 + x as usize])
+        } else {
+            println!("within a map");
+            None
+        }
     }
     pub fn size(&self) -> (usize, usize) {
         self.dims
     }
-    pub fn tile_at(&self, posn: Vec2i) -> Tile {
-        self.tileset[self.tile_id_at(posn)]
+    pub fn tile_at(&self, posn: Vec2i) -> Option<Tile> {
+        match self.tile_id_at(posn) {
+            Some(tileid) => Some(self.tileset[tileid]),
+            _ => None,
+        }
     }
     // ...
-    pub fn tile_and_bounds_at(&self, pos: Vec2i) -> (Tile, Rect) {
-        let tile = self.tile_at(pos);
+    pub fn tile_and_bounds_at(&self, pos: Vec2i) -> Option<(Tile, Rect)> {
+        // let tile = self.tile_at(pos);
 
         // convert real coordinate to tile coordinates
         let x = (pos.0 - self.position.0) / TILE_SZ as i32; // invert operation to get world coordinates
         let y = (pos.1 - self.position.1) / TILE_SZ as i32;
 
-        (
-            tile,
-            Rect {
-                x: x * TILE_SZ as i32 + self.position.0,
-                y: y * TILE_SZ as i32 + self.position.1,
-                w: TILE_SZ as u16,
-                h: TILE_SZ as u16,
-            },
-        )
+        match self.tile_at(pos) {
+            Some(tile) => Some((
+                tile,
+                Rect {
+                    x: x * TILE_SZ as i32 + self.position.0,
+                    y: y * TILE_SZ as i32 + self.position.1,
+                    w: TILE_SZ as u16,
+                    h: TILE_SZ as u16,
+                },
+            )),
+            _ => None,
+        }
+        // (
+        //     tile,
+        //     Rect {
+        //         x: x * TILE_SZ as i32 + self.position.0,
+        //         y: y * TILE_SZ as i32 + self.position.1,
+        //         w: TILE_SZ as u16,
+        //         h: TILE_SZ as u16,
+        //     }
+        // )
     }
     /// Draws the portion of self appearing within screen.
     /// This could just as well be an extension trait on Screen defined in =tiles.rs= or something, like we did for =sprite.rs= and =draw_sprite=.

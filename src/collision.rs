@@ -38,11 +38,27 @@ pub fn rect_displacement(r1: Rect, r2: Rect) -> Option<(i32, i32)> {
     }
 }
 
+fn get_map_indx(tl: Vec2i, tr: Vec2i, br: Vec2i, bl: Vec2i, maps: &Vec<Tilemap>) -> usize{
+    let mut result = 0;
+    for (mi, m) in maps.iter().enumerate(){
+        // println!("cur pos {:?}", pos);
+        // println!("map pos {:?}", m.position);
+        if (tl.0 <= m.position.0 + 256 && tl.1 <= m.position.1 + 256) &&
+            (tr.0 <= m.position.0 + 256 && tr.1 <= m.position.1 + 256) &&
+            (br.0 <= m.position.0 + 256 && br.1 <= m.position.1 + 256) &&
+            (bl.0 <= m.position.0 + 256 && bl.1 <= m.position.1 + 256) {
+            result = mi;
+            break
+        }
+    }
+    result
+}
+
 // Here we will be using push() on into, so it can't be a slice
 pub fn gather_contacts(
     positions: &[Vec2i],
     sizes: &[(usize, usize)],
-    tilemap: &[&Tilemap],
+    tilemap: &Vec<Tilemap>,
     into: &mut Vec<Contact>,
     num_jumps: &mut usize,
 ) {
@@ -82,11 +98,27 @@ pub fn gather_contacts(
         let bl = Vec2i(pos.0, pos.1 + size.0 as i32);
 
         // let map = &levels[_game.level].0;
-        let map = &tilemap[0];
-        let (ttl, tlrect) = map.tile_and_bounds_at(tl);
-        let (ttr, trrect) = map.tile_and_bounds_at(tr);
-        let (btl, blrect) = map.tile_and_bounds_at(bl);
-        let (btr, brrect) = map.tile_and_bounds_at(br);
+        let map_indx = get_map_indx(tl, tr, br, bl, &tilemap);
+        // println!("map indx: {:}", map_indx);
+        let map = &tilemap[map_indx];
+        let (ttl, tlrect) = match map.tile_and_bounds_at(tl) {
+            Some((ttl, tlrect)) => (ttl, tlrect),
+            _ => (Tile{solid: false, jump_reset: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
+        };
+        let (ttr, trrect) = match map.tile_and_bounds_at(tr) {
+            Some((ttr, trrect)) => (ttr, trrect),
+            _ => (Tile{solid: false, jump_reset: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
+        };
+        let (btl, blrect) = match map.tile_and_bounds_at(bl) {
+            Some((btl, blrect)) => (btl, blrect),
+            _ => (Tile{solid: false, jump_reset: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
+        };
+        let (btr, brrect) = match map.tile_and_bounds_at(br) {
+            Some((btr, brrect)) => (btr, brrect),
+            _ => (Tile{solid: false, jump_reset: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
+        };
+        // println!("touching top left  {:?}", (ttl, tlrect));
+        // println!("touching bottom right  {:?}", (btr, brrect));
 
         let sprite_rect = Rect {
             x: pos.0,
@@ -164,7 +196,7 @@ pub fn restitute(
     sizes: &[(usize, usize)],
     velocities: &mut [Vec2i],
     camera: &mut Vec2i,
-    tilemap: &[&Tilemap],
+    tilemap: &Vec<Tilemap>,
     contacts: &mut [Contact],
 ) {
     // handle restitution of dynamics against dynamics and dynamics against statics wrt contacts.
