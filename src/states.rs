@@ -302,7 +302,7 @@ impl State for Scroll {
         // gather_contacts(
         //     all_pos.as_slice(),
         //     &_game.sizes,
-        //     &[&levels[_game.level].0[0]],
+        //     &vec![levels[_game.level].0[0]],
         //     &mut contacts,
         //     &mut _game.game_data.num_jumps,
         // );
@@ -311,7 +311,7 @@ impl State for Scroll {
         //     &_game.sizes,
         //     all_vel.as_mut_slice(),
         //     &mut _game.camera,
-        //     &[&levels[_game.level].0[0]],
+        //     &vec![levels[_game.level].0[0]],
         //     &mut contacts,
         // );
         // cur_player.pos = all_pos[0];
