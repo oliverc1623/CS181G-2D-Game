@@ -183,7 +183,7 @@ pub fn gather_contacts(
             // println!("jump reset btl");
             *num_jumps = 0;
         }
-        if btl.jump_reset {
+        if btr.jump_reset {
             // println!("touching buttom right");
             // println!("jump reset btr");
             *num_jumps = 0;
