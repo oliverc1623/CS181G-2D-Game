@@ -48,6 +48,7 @@ pub struct GameState {
     pub map_y_boundary: i32,
     pub tt_tileset: Rc<Tileset>,
     pub maps: Vec<Tilemap>,
+    pub side_map: Vec<Tilemap>,
 }
 
 // Probably should be WinitInputHelper
@@ -298,24 +299,24 @@ impl State for Scroll {
         // reset number of jumps
         // Detect collisions: Convert positions and sizes to collision bodies, generate contacts
         // Outline of a possible approach to tile collision:
-        // let mut contacts = vec![];
-        // gather_contacts(
-        //     all_pos.as_slice(),
-        //     &_game.sizes,
-        //     &vec![levels[_game.level].0[0]],
-        //     &mut contacts,
-        //     &mut _game.game_data.num_jumps,
-        // );
-        // restitute(
-        //     all_pos.as_mut_slice(),
-        //     &_game.sizes,
-        //     all_vel.as_mut_slice(),
-        //     &mut _game.camera,
-        //     &vec![levels[_game.level].0[0]],
-        //     &mut contacts,
-        // );
-        // cur_player.pos = all_pos[0];
-        // cur_player.vel = all_vel[0];
+        let mut contacts = vec![];
+        gather_contacts(
+            all_pos.as_slice(),
+            &_game.sizes,
+            &_game.side_map,
+            &mut contacts,
+            &mut _game.game_data.num_jumps,
+        );
+        restitute(
+            all_pos.as_mut_slice(),
+            &_game.sizes,
+            all_vel.as_mut_slice(),
+            &mut _game.camera,
+            &_game.side_map,
+            &mut contacts,
+        );
+        cur_player.pos = all_pos[0];
+        cur_player.vel = all_vel[0];
         // _game.server.update_players(&mut _game.players);
         // update camera after restitution
         // _game.camera.0 += _game.players[&_game.server.id].vel.0;
