@@ -52,6 +52,7 @@ pub struct GameState {
     pub maps: Vec<Tilemap>,
     pub side_map: Vec<Tilemap>,
     pub font: Font<'static>,
+    pub game: usize,
 }
 
 #[derive(Debug)]
@@ -117,7 +118,7 @@ impl State for Title {
                 let mut i: i32 = 0;
                 let mut psn: Vec2i = Vec2i(_game.map_x_boundary, 0);
                 while i < _game.map_y_boundary {
-                    _game.maps.push(Tileset::create_map(&_game.tt_tileset, psn));
+                    _game.maps.push(Tileset::create_map(&_game.tt_tileset, psn, _game.game));
                     psn.1 += TILE_MAP_SIZE as i32;
                     i += TILE_MAP_SIZE as i32;
                 }
@@ -149,7 +150,7 @@ impl State for Title {
                 let mut i: i32 = 0;
                 let mut psn: Vec2i = Vec2i(0, _game.map_y_boundary);
                 while i < _game.map_x_boundary {
-                    _game.maps.push(Tileset::create_map(&_game.tt_tileset, psn));
+                    _game.maps.push(Tileset::create_map(&_game.tt_tileset, psn, _game.game));
                     psn.0 += TILE_MAP_SIZE as i32;
                     i += TILE_MAP_SIZE as i32;
                 }

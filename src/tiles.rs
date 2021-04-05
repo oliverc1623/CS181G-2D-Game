@@ -2,7 +2,7 @@ use crate::graphics::Screen;
 use crate::texture::Texture;
 use crate::types::*;
 use rand::Rng;
-use std::rc::Rc;
+use std::{rc::Rc, usize};
 
 pub const TILE_SZ: usize = 32;
 /// A graphical tile
@@ -55,17 +55,43 @@ impl Tileset {
         id.0 < self.tiles.len()
     }
 
-    pub fn create_map(tileset: &Rc<Tileset>, psn: Vec2i) -> Tilemap {
+    pub fn create_map(tileset: &Rc<Tileset>, psn: Vec2i, game: usize) -> Tilemap {
         let mut rng = rand::thread_rng();
         let mut tiles: Vec<usize> = vec![];
-        let mut n: usize = rng.gen_range(0..50);
-        for _i in 0..64 {
-            if n <= 12 {
-                tiles.push(n);
-            } else {
-                tiles.push(8);
+        
+
+        if game == 1{
+            let mut n: usize = rng.gen_range(0..55);
+            for _i in 0..64 {
+                if n <= 11 {
+                    tiles.push(n);
+                } else if n > 11 && n < 20{
+                    tiles.push(0);
+                } else if n > 19 && n < 25{
+                    tiles.push(1);
+                } else if n > 24 && n < 32{
+                    tiles.push(2);
+                } else if n > 31 && n < 40{
+                    tiles.push(3);
+                } else if n > 39 && n < 43{
+                    tiles.push(4);
+                } else if n > 42 && n < 47{
+                    tiles.push(6);
+                } else if n > 46 {
+                    tiles.push(9);
+                } 
+                n = rng.gen_range(0..55);
             }
-            n = rng.gen_range(0..50);
+        } else {
+            let mut n: usize = rng.gen_range(0..50);
+            for _i in 0..64 {
+                if n <= 12 {
+                    tiles.push(n);
+                } else {
+                    tiles.push(8);
+                }
+                n = rng.gen_range(0..50);
+            }
         }
         let map = Tilemap::new(psn, (8, 8), &tileset, tiles);
         return map;

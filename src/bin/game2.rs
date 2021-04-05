@@ -554,6 +554,7 @@ fn main() {
         maps: get_maps(&other_tileset),
         side_map: get_side_maps(&tileset),
         font,
+        game: 2, 
     };
 
     let state = Game2DEngine::run(
