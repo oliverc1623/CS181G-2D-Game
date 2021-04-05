@@ -477,7 +477,7 @@ fn main() {
     let font: Font<'static> = Font::try_from_bytes(font_data).unwrap();
 
 
-    let mut game = GameState {
+    let game = GameState {
         // Every entity has a position, a size, a texture, and animation state.
         // Assume entity 0 is the player
         server,
