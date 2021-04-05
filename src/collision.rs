@@ -269,14 +269,14 @@ pub fn restitute(
                             // println!("Box touched left side{:?}", c);
                             positions[ai].0 -= horizontal_mtv;
                             velocities[ai].0 = 0;
-                            camera.0 += velocities[ai].0;
+                            camera.0 -= horizontal_mtv;
                         //
                         // disp[player_indx] = (horizontal_mtv, 0)
                         } else {
                             // println!("Box touched right side{:?}", c);
-                            a_rect.x += horizontal_mtv;
+                            positions[ai].0 += horizontal_mtv;
                             velocities[ai].0 = 0;
-                            camera.0 += velocities[ai].0;
+                            camera.0 += horizontal_mtv;
                             // camera.0 = a_rect.x;
                             // disp[player_indx] = (horizontal_mtv, 0)
                         }
@@ -285,14 +285,14 @@ pub fn restitute(
                             // println!("Box touched down side{:?}", c);
                             positions[ai].1 -= vertical_mtv;
                             velocities[ai].1 = 0;
-                            camera.1 += velocities[ai].1;
+                            camera.1 -= vertical_mtv;
                         // camera.1 = a_rect.y;
                         // disp[player_indx] = (0, vertical_mtv)
                         } else {
                             // println!("Box touched up side{:?}", c);
                             positions[ai].1 += vertical_mtv;
                             velocities[ai].1 = 0;
-                            camera.1 += velocities[ai].1;
+                            camera.1 += vertical_mtv;
                             // camera.1 = a_rect.y;
                             // disp[player_indx] = (0, vertical_mtv)
                         }

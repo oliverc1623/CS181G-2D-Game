@@ -178,6 +178,7 @@ impl State for Title {
         );
         cur_player.pos = all_pos[0];
         cur_player.vel = all_vel[0];
+        // _game.camera = cur_player.pos;
 
         _game.server.update_players(&mut _game.players);
 
