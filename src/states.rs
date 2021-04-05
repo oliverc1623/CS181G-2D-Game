@@ -227,10 +227,30 @@ impl State for Title {
                 player.1.pos,
             );
         }
-        let mut img: RgbImage = ImageBuffer::new(560, 450);
-        let r = Rgb([255; 3]);
-        let sc = rusttype::Scale{x: 20.0, y: 20.0};
-        draw_text(&mut img, r, 0, 0, sc, &_game.font, "SAMPLE");
+
+        screen.bitblt(
+            &_game.textures[2],
+            Rect {
+                x: 0,
+                y: 0,
+                w: (WIDTH/4)as u16,
+                h: (HEIGHT/4) as u16,
+            },
+            Vec2i(0,0),
+        );
+        // let img: RgbImage = ImageBuffer::new(512, 512);
+        // Construct a new by repeated calls to the supplied closure.
+        // let mut img = ImageBuffer::from_fn(512, 512, |x, y| {
+        //     if x % 2 == 0 {
+        //         image::Luma([255u8])
+        //     } else {
+        //         image::Luma([255u8])
+        //     }
+        // });        
+        // let r = Rgb([255; 3]);
+        // let sc = rusttype::Scale{x: 10.0, y: 10.0};
+        // let p = img[(0,0)];
+        // draw_text(&mut img, p, 10, 10, sc, &_game.font, "SAMPLE");
     }
 }
 

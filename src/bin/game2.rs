@@ -472,7 +472,7 @@ fn main() {
         &rsrc.load_texture(Path::new("content/tilesheet.png")),
     ));
 
-    let font_data: &[u8] = include_bytes!("C:/Users/Oliver Chang/Documents/cs181g/Game2DEngine/content/helvetica.ttf");
+    let font_data: &[u8] = include_bytes!("../../content/helvetica.ttf");
     let font: Font<'static> =  Font::try_from_bytes(font_data).unwrap();
 
     let mut game = GameState {
