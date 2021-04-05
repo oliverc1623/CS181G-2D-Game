@@ -1,3 +1,4 @@
 /target
 .idea/
-save.json
+save*.json
+debug.log
