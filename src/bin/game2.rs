@@ -16,6 +16,7 @@ use Game2DEngine::types::*;
 use Game2DEngine::resources::*;
 use Game2DEngine::server::Server;
 use Game2DEngine::states::*;
+use Game2DEngine::save::*;
 
 const WIDTH: usize = 320 * 2;
 const HEIGHT: usize = 240 * 2;
@@ -445,8 +446,12 @@ fn main() {
 
     let mut server = Server::new();
     server.connect("45.10.152.68:16512");
-    let mut player = Player::new();
+    let mut player = load("save2.json");
     player.id = server.id;
+
+    let cam = Vec2i((player.pos.0 - WIDTH as i32 / 2).max(0), (player.pos.1 - HEIGHT as i32 / 2).max(0));
+    let stack: Vec<Box<dyn State>> = vec![if player.world == 0 { Box::new(Title()) } else { Box::new(Scroll()) }];
+    let level:usize = 1 - player.world as usize;
     let mut players = HashMap::<i32, Player>::new();
     players.entry(player.id).or_insert(player);
 
@@ -471,9 +476,9 @@ fn main() {
         ],
         &rsrc.load_texture(Path::new("content/tilesheet.png")),
     ));
+    let font_data: &[u8] = include_bytes!("../../content/helvetica.ttf");
+    let font: Font<'static> = Font::try_from_bytes(font_data).unwrap();
 
-    let font_data: &[u8] = include_bytes!("C:/Users/Oliver Chang/Documents/cs181g/Game2DEngine/content/helvetica.ttf");
-    let font: Font<'static> =  Font::try_from_bytes(font_data).unwrap();
 
     let mut game = GameState {
         // Every entity has a position, a size, a texture, and animation state.
@@ -494,12 +499,12 @@ fn main() {
             overworld_player_anim.start(),
         ],
         // Current level
-        level: 1,
+        level: 1 - 1,
         // Camera position
-        camera: Vec2i(0, 0),
+        camera: cam,
         // background position
         background_pos: Vec2i(0, 0),
-        state_stack: vec![Box::new(Title())],
+        state_stack: stack,
         game_data: GameData {
             score: 0,
             speed_multiplier: 1,
@@ -510,10 +515,10 @@ fn main() {
         tt_tileset: overworld_tileset,
         maps: get_maps(&other_tileset),
         side_map: get_side_maps(&tileset),
-        font
+        font,
     };
 
-    Game2DEngine::run(
+    let state = Game2DEngine::run(
         WIDTH,
         HEIGHT,
         window_builder,
@@ -523,6 +528,7 @@ fn main() {
         draw_game,
         update_game,
     );
+    save(&state.players[&state.server.id],"save2.json");
 }
 
 fn draw_game(

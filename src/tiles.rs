@@ -113,7 +113,7 @@ impl Tilemap {
         if (x >= 0 && x < self.dims.0 as i32) && (y >= 0 && y < self.dims.1 as i32) {
             Some(self.map[y as usize * self.dims.0 + x as usize])
         } else {
-            println!("within a map");
+            // println!("within a map");
             None
         }
     }

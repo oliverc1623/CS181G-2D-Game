@@ -318,7 +318,7 @@ impl State for Scroll {
         }
         // Update all entities' positions
         // update current player
-        println!("{}", cur_player.vel.1); 
+        // println!("{}", cur_player.vel.1);
         cur_player.pos.0 += cur_player.vel.0;
         cur_player.pos.1 += cur_player.vel.1; 
 

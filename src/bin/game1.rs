@@ -447,7 +447,7 @@ fn main() {
 
     let cam = Vec2i((player.pos.0 - WIDTH as i32 / 2).max(0), (player.pos.1 - HEIGHT as i32 / 2).max(0));
     let stack: Vec<Box<dyn State>> = vec![if player.world == 0 { Box::new(Title()) } else { Box::new(Scroll()) }];
-    let level = 1 - player.world;
+    let level:usize = 1 - player.world as usize;
     let mut players = HashMap::<i32, Player>::new();
     players.entry(player.id).or_insert(player);
 
@@ -496,7 +496,7 @@ fn main() {
             overworld_player_anim.start(),
         ],
         // Current level
-        level: 1 - 1,
+        level,
         // Camera position
         camera: cam,
         // background position
