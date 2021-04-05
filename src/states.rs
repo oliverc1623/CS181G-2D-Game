@@ -251,8 +251,11 @@ impl State for Scroll {
         _game.level = 0;
         let cur_player = _game.players.get_mut(&_game.server.id).unwrap();
         // StateResult::Keep
-        let max_vel = 20;
-        let min_vel = -20;
+        let max_vel = 10;
+        let min_vel = -10;
+        let mut held_up = false; 
+        let mut vert_moving: bool = false;
+        let mut horiz_moving = false; 
         // println!("before {:}", _game.velocities[0].0);
         if key_input.key_held(VirtualKeyCode::Right) {
             // _game.velocities[0].0 = 7;
@@ -262,9 +265,10 @@ impl State for Scroll {
                 cur_player.vel.0 += 2;
                 // println!("inside {:}", _game.velocities[0].0);
             }
+            horiz_moving = true; 
             _game.anim_state[0].tick();
         } else if key_input.key_released(VirtualKeyCode::Right) {
-            cur_player.vel.0 = (cur_player.vel.0 as f32 * 0.25) as i32;
+            //cur_player.vel.0 = (cur_player.vel.0 as f32 * 0.25) as i32; 
             // println!("after {:}", _game.velocities[0].0);
         }
         if key_input.key_held(VirtualKeyCode::Left) {
@@ -273,30 +277,57 @@ impl State for Scroll {
                 cur_player.vel.0 -= 2;
                 // println!("inside {:}", _game.velocities[0].0);
             }
+            horiz_moving = true; 
         } else if key_input.key_released(VirtualKeyCode::Left) {
-            cur_player.vel.0 = (cur_player.vel.0 as f32 * 0.25) as i32;
+            //cur_player.vel.0 = (cur_player.vel.0 as f32 * 0.25) as i32;
         }
         if key_input.key_held(VirtualKeyCode::Up) {
-            if _game.game_data.num_jumps < 2 {
-                cur_player.vel.1 = -5;
+            if _game.game_data.num_jumps < 2 && cur_player.vel.1 >= 0 && cur_player.vel.1 >= min_vel {
+                cur_player.vel.1 = -18; 
                 _game.game_data.num_jumps += 1;
+            } else if _game.game_data.num_jumps < 2 && cur_player.vel.1 < 0 {
+                cur_player.vel.1 += -6; 
             }
-        } else if key_input.key_released(VirtualKeyCode::Up) {
-            cur_player.vel.1 /= 2;
-            cur_player.vel.1 = 2;
-        }
+            vert_moving = true; 
+            held_up = true; 
+            if cur_player.vel.1 == 0 {
+                held_up = false; 
+            }
+             
+        } else if key_input.key_released(VirtualKeyCode::Up) {}
         if key_input.key_held(VirtualKeyCode::Down) {
             if cur_player.vel.1 < max_vel {
                 cur_player.vel.1 += 2;
+                vert_moving = true; 
                 // println!("inside {:}", _game.velocities[0].0);
             }
         } else if key_input.key_released(VirtualKeyCode::Down) {
-            cur_player.vel.1 = (cur_player.vel.1 as f32 * 0.25) as i32;
+           // cur_player.vel.1 = (cur_player.vel.1 as f32 * 0.25) as i32;
+        }
+
+        if !vert_moving {
+            cur_player.vel.1 = (cur_player.vel.1 as f32 * 0.5) as i32;
+        }
+        if !horiz_moving {
+            cur_player.vel.0 = (cur_player.vel.0 as f32 * 0.5) as i32; 
+        }
+
+        //if player is not holding the up key, start falling. 
+        if !held_up {
+            cur_player.vel.1 = 4; 
         }
         // Update all entities' positions
         // update current player
+        println!("{}", cur_player.vel.1); 
         cur_player.pos.0 += cur_player.vel.0;
-        cur_player.pos.1 += cur_player.vel.1;
+        cur_player.pos.1 += cur_player.vel.1; 
+
+        if cur_player.vel.1 < 0 {
+            cur_player.vel.1 /= 2; 
+        }
+        if cur_player.vel.1 == -6 {
+            cur_player.vel.1 = 2; 
+        }
 
         // for (posn, vel) in _game.positions.iter_mut().zip(_game.velocities.iter()) {
         //     posn.0 += vel.0;
