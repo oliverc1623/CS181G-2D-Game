@@ -187,7 +187,7 @@ impl State for Title {
             // println!("hitting p");
             _game.players.get_mut(&_game.server.id).unwrap().vel = Vec2i(0, 0);
             _game.players.get_mut(&_game.server.id).unwrap().world = 1;
-            _game.players.get_mut(&_game.server.id).unwrap().pos = Vec2i(0, 0);
+            _game.players.get_mut(&_game.server.id).unwrap().pos = Vec2i(50, 50);
             StateResult::Swap(Box::new(Scroll()))
         } else {
             StateResult::Keep
