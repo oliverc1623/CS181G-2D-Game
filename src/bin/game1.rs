@@ -442,11 +442,12 @@ fn main() {
 
     let mut server = Server::new();
     server.connect("45.10.152.68:16512");
-    let mut player = load();
+    let mut player = load("save1.json");
     player.id = server.id;
 
     let cam = Vec2i((player.pos.0 - WIDTH as i32 / 2).max(0), (player.pos.1 - HEIGHT as i32 / 2).max(0));
-
+    let stack: Vec<Box<dyn State>> = vec![if player.world == 0 { Box::new(Title()) } else { Box::new(Scroll()) }];
+    let level = 1 - player.world;
     let mut players = HashMap::<i32, Player>::new();
     players.entry(player.id).or_insert(player);
 
@@ -473,7 +474,8 @@ fn main() {
     ));
 
     let font_data: &[u8] = include_bytes!("../../content/helvetica.ttf");
-    let font: Font<'static> =  Font::try_from_bytes(font_data).unwrap();
+    let font: Font<'static> = Font::try_from_bytes(font_data).unwrap();
+
 
     let mut game = GameState {
         // Every entity has a position, a size, a texture, and animation state.
@@ -494,12 +496,12 @@ fn main() {
             overworld_player_anim.start(),
         ],
         // Current level
-        level: 1,
+        level: 1 - 1,
         // Camera position
         camera: cam,
         // background position
         background_pos: Vec2i(0, 0),
-        state_stack: vec![Box::new(Title())],
+        state_stack: stack,
         game_data: GameData {
             score: 0,
             speed_multiplier: 1,
@@ -510,7 +512,7 @@ fn main() {
         tt_tileset: overworld_tileset,
         maps: get_maps(&other_tileset),
         side_map: get_side_maps(&tileset),
-        font
+        font,
     };
 
     let state = Game2DEngine::run(
@@ -523,7 +525,7 @@ fn main() {
         draw_game,
         update_game,
     );
-    save(&state.players[&state.server.id]);
+    save(&state.players[&state.server.id],"save1.json");
 }
 
 fn draw_game(
