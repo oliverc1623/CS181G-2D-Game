@@ -7,7 +7,7 @@ use crate::texture::*;
 use crate::tiles::*;
 use crate::types::*;
 use imageproc::drawing::draw_text;
-use image::{GenericImage, GenericImageView, ImageBuffer, RgbImage, Rgb};
+use image::{GenericImage, GenericImageView, ImageBuffer, RgbImage, Rgb, RgbaImage} ;
 use rusttype::Font;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -227,30 +227,19 @@ impl State for Title {
                 player.1.pos,
             );
         }
-
+        let mut img: RgbaImage = ImageBuffer::new(512, 512);
+        let sc = rusttype::Scale{x: 50.0, y: 50.0};        
+        let text_img = draw_text(&mut img, image::Rgba([0,0,0,255]), 0, 0, sc, &_game.font, "SAMPLE");        
         screen.bitblt(
-            &_game.textures[2],
+            &Texture::new(text_img),
             Rect {
                 x: 0,
                 y: 0,
-                w: (WIDTH/4)as u16,
-                h: (HEIGHT/4) as u16,
+                w: (WIDTH/2)as u16,
+                h: (HEIGHT/2) as u16,
             },
             Vec2i(0,0),
         );
-        // let img: RgbImage = ImageBuffer::new(512, 512);
-        // Construct a new by repeated calls to the supplied closure.
-        // let mut img = ImageBuffer::from_fn(512, 512, |x, y| {
-        //     if x % 2 == 0 {
-        //         image::Luma([255u8])
-        //     } else {
-        //         image::Luma([255u8])
-        //     }
-        // });        
-        // let r = Rgb([255; 3]);
-        // let sc = rusttype::Scale{x: 10.0, y: 10.0};
-        // let p = img[(0,0)];
-        // draw_text(&mut img, p, 10, 10, sc, &_game.font, "SAMPLE");
     }
 }
 
@@ -338,7 +327,7 @@ impl State for Scroll {
         }
         // Update all entities' positions
         // update current player
-        println!("{}", cur_player.vel.1); 
+        // println!("{}", cur_player.vel.1);
         cur_player.pos.0 += cur_player.vel.0;
         cur_player.pos.1 += cur_player.vel.1; 
 
