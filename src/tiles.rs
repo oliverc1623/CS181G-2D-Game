@@ -59,7 +59,7 @@ impl Tileset {
         let mut rng = rand::thread_rng();
         let mut tiles: Vec<usize> = vec![];
         let mut n: usize = rng.gen_range(0..50);
-        for i in 0..64 {
+        for _i in 0..64 {
             if n <= 12 {
                 tiles.push(n);
             } else {

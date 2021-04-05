@@ -1,9 +1,7 @@
-use crate::states::GameState;
-use crate::types::{Player, Vec2i};
-use serde::{Deserialize, Serialize};
+use crate::types::{Player};
 use std;
 use std::collections::HashMap;
-use std::io::{Read, Stderr, Write};
+use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
 use std::str::FromStr;
 
@@ -15,7 +13,7 @@ pub struct Server {
     waiting: bool,
     pub connected: bool,
 }
-
+#[allow(dead_code)]
 impl Server {
     pub fn new() -> Server {
         Server {
@@ -38,7 +36,7 @@ impl Server {
         }
         let mut buf: [u8; BUFSIZE] = [0; BUFSIZE]; // well memory is cheap
         stream.read(&mut buf).unwrap();
-        stream.set_nonblocking(true);
+        stream.set_nonblocking(true).unwrap();
         let s = std::str::from_utf8(&buf).unwrap();
         let term = s.find("\n").unwrap();
         let id = s[..term].parse::<i32>().unwrap();
@@ -50,7 +48,7 @@ impl Server {
     fn disconnect(&mut self) {
         let mut sock = self.sock.as_ref().unwrap();
         sock.write("{\"op\":\"disconnect\"}\n".as_bytes()).unwrap();
-        sock.flush();
+        sock.flush().unwrap();
         sock.shutdown(Shutdown::Both).unwrap();
     }
 
@@ -65,7 +63,7 @@ impl Server {
         });
         let j = serde_json::to_string(&obj).unwrap() + "\n";
         sock.write(j.as_bytes())?;
-        sock.flush();
+        sock.flush().unwrap();
         let mut buf: [u8; BUFSIZE] = [0; BUFSIZE];
         sock.read(&mut buf)?;
         let s = std::str::from_utf8(&mut buf)?;

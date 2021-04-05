@@ -2,13 +2,11 @@ use pixels::{Pixels, SurfaceTexture};
 use winit::platform::run_return::EventLoopExtRunReturn;
 use winit::window::WindowBuilder;
 
-use serde::{Deserialize, Serialize};
-
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit_input_helper::WinitInputHelper;
 pub mod types;
-use types::{Player, Rgba, Vec2i};
+use types::{Rgba, Vec2i};
 
 pub mod graphics;
 use graphics::Screen;
@@ -22,6 +20,8 @@ pub mod server;
 pub mod states;
 pub mod texture;
 pub mod tiles;
+pub mod save;
+
 
 const DEPTH: usize = 4;
 const DT: f64 = 1.0 / 60.0;
@@ -35,7 +35,7 @@ pub fn run<Rule, State>(
     mut state: State,
     draw: impl Fn(&Resources, &Rule, &State, &mut Screen, usize) + 'static,
     update: impl Fn(&Resources, &Rule, &mut State, &WinitInputHelper, usize) + 'static,
-) {
+) -> State {
     use std::time::Instant;
 
     let mut event_loop = EventLoop::new();
@@ -97,4 +97,5 @@ pub fn run<Rule, State>(
         // When did the last frame end?
         since = Instant::now();
     });
+    state
 }

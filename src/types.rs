@@ -1,4 +1,3 @@
-use crate::tiles::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

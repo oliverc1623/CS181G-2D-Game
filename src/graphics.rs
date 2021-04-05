@@ -1,8 +1,6 @@
 // We can pull in definitions from elsewhere in the crate!
-use crate::animation::AnimationState;
 use crate::texture::Texture;
 use crate::types::{Rect, Rgba, Vec2i};
-use std::rc::Rc;
 
 pub struct Screen<'fb> {
     framebuffer: &'fb mut [u8],

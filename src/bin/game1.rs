@@ -2,9 +2,6 @@ use std::collections::HashMap;
 use std::path::Path;
 use std::rc::Rc;
 
-use fontdue::layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle};
-use fontdue::Font;
-
 use winit::dpi::LogicalSize;
 
 use winit::window::WindowBuilder;
@@ -19,17 +16,10 @@ use Game2DEngine::types::*;
 use Game2DEngine::resources::*;
 use Game2DEngine::server::Server;
 use Game2DEngine::states::*;
+use Game2DEngine::save::*;
 
 const WIDTH: usize = 320 * 2;
 const HEIGHT: usize = 240 * 2;
-const CHARACTER: char = 'b';
-const SIZE: f32 = 20.0;
-
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
-enum EntityType {
-    // Player,
-    Enemy,
-}
 
 // type Level = (Vec<Tilemap>, Vec<(EntityType, i32, i32)>);
 fn main() {
@@ -42,7 +32,7 @@ fn main() {
             .with_resizable(false)
     };
     // Here's our resources...
-    let mut rsrc = Resources::new();
+    let rsrc = Resources::new();
     let tileset = Rc::new(Tileset::new(
         vec![
             Tile {
@@ -119,19 +109,19 @@ fn main() {
     // overworld tileset
     let overworld_tileset = Rc::new(Tileset::new(
         vec![
-            Tile {solid: false,jump_reset: false,},//0
-            Tile {solid: false,jump_reset: false,},//1
-            Tile {solid: false,jump_reset: false,},//2
-            Tile {solid: false,jump_reset: false,},//3
-            Tile {solid: false,jump_reset: false,},//4
-            Tile {solid: false,jump_reset: false,},//5
-            Tile {solid: false,jump_reset: false,},//6
-            Tile {solid: false,jump_reset: false,},//7
-            Tile {solid: false,jump_reset: false,},//8
-            Tile {solid: false,jump_reset: false,},//9
-            Tile {solid: true,jump_reset: false,},//10
-            Tile {solid: false,jump_reset: false,},//11
-            Tile {solid: false,jump_reset: false,},//12
+            Tile { solid: false, jump_reset: false },//0
+            Tile { solid: false, jump_reset: false },//1
+            Tile { solid: false, jump_reset: false },//2
+            Tile { solid: false, jump_reset: false },//3
+            Tile { solid: false, jump_reset: false },//4
+            Tile { solid: false, jump_reset: false },//5
+            Tile { solid: false, jump_reset: false },//6
+            Tile { solid: false, jump_reset: false },//7
+            Tile { solid: false, jump_reset: false },//8
+            Tile { solid: false, jump_reset: false },//9
+            Tile { solid: true, jump_reset: false },//10
+            Tile { solid: false, jump_reset: false },//11
+            Tile { solid: false, jump_reset: false },//12
         ],
         &rsrc.load_texture(Path::new("content/tilesheet.png")),
     ));
@@ -313,7 +303,7 @@ fn main() {
         ];
     }
 
-    fn get_side_maps(tileset: &Rc<Tileset>) -> Vec<Tilemap>{
+    fn get_side_maps(tileset: &Rc<Tileset>) -> Vec<Tilemap> {
         return vec![Tilemap::new(
             Vec2i(0, 0),
             // Map size
@@ -342,7 +332,7 @@ fn main() {
                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
                 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
             ],
-        )]
+        )];
     }
 
     // Here's our game rules (the engine doesn't know about these)
@@ -452,34 +442,37 @@ fn main() {
 
     let mut server = Server::new();
     server.connect("45.10.152.68:16512");
-    let mut player = Player::new();
+    let mut player = load();
     player.id = server.id;
+
+    let cam = Vec2i((player.pos.0 - WIDTH as i32 / 2).max(0), (player.pos.1 - HEIGHT as i32 / 2).max(0));
+
     let mut players = HashMap::<i32, Player>::new();
     players.entry(player.id).or_insert(player);
 
-    let mut map_x_boundary = 1024 as i32;
-    let mut map_y_boundary = 1024 as i32;
+    let map_x_boundary = 1024 as i32;
+    let map_y_boundary = 1024 as i32;
 
     let other_tileset = Rc::new(Tileset::new(
         vec![
-            Tile {solid: false,jump_reset: false,},//0
-            Tile {solid: false,jump_reset: false,},//1
-            Tile {solid: false,jump_reset: false,},//2
-            Tile {solid: false,jump_reset: false,},//3
-            Tile {solid: false,jump_reset: false,},//4
-            Tile {solid: false,jump_reset: false,},//5
-            Tile {solid: false,jump_reset: false,},//6
-            Tile {solid: false,jump_reset: false,},//7
-            Tile {solid: false,jump_reset: false,},//8
-            Tile {solid: false,jump_reset: false,},//9
-            Tile {solid: true,jump_reset: false,},//10
-            Tile {solid: false,jump_reset: false,},//11
-            Tile {solid: false,jump_reset: false,},//12
+            Tile { solid: false, jump_reset: false },//0
+            Tile { solid: false, jump_reset: false },//1
+            Tile { solid: false, jump_reset: false },//2
+            Tile { solid: false, jump_reset: false },//3
+            Tile { solid: false, jump_reset: false },//4
+            Tile { solid: false, jump_reset: false },//5
+            Tile { solid: false, jump_reset: false },//6
+            Tile { solid: false, jump_reset: false },//7
+            Tile { solid: false, jump_reset: false },//8
+            Tile { solid: false, jump_reset: false },//9
+            Tile { solid: true, jump_reset: false },//10
+            Tile { solid: false, jump_reset: false },//11
+            Tile { solid: false, jump_reset: false },//12
         ],
         &rsrc.load_texture(Path::new("content/tilesheet.png")),
     ));
 
-    let mut game = GameState {
+    let game = GameState {
         // Every entity has a position, a size, a texture, and animation state.
         // Assume entity 0 is the player
         server,
@@ -500,7 +493,7 @@ fn main() {
         // Current level
         level: 1,
         // Camera position
-        camera: Vec2i(0, 0),
+        camera: cam,
         // background position
         background_pos: Vec2i(0, 0),
         state_stack: vec![Box::new(Title())],
@@ -516,7 +509,7 @@ fn main() {
         side_map: get_side_maps(&tileset),
     };
 
-    Game2DEngine::run(
+    let state = Game2DEngine::run(
         WIDTH,
         HEIGHT,
         window_builder,
@@ -526,6 +519,7 @@ fn main() {
         draw_game,
         update_game,
     );
+    save(&state.players[&state.server.id]);
 }
 
 fn draw_game(

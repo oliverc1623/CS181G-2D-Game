@@ -13,7 +13,7 @@ pub struct Contact {
     b: ColliderID,
     mtv: (i32, i32),
 }
-
+#[allow(dead_code)]
 fn rect_touching(r1: Rect, r2: Rect) -> bool {
     // r1 left is left of r2 right
     r1.x <= r2.x+r2.w as i32 &&
@@ -191,6 +191,7 @@ pub fn gather_contacts(
     }
 }
 
+#[allow(unused_variables)]
 pub fn restitute(
     positions: &mut [Vec2i],
     sizes: &[(usize, usize)],
@@ -223,7 +224,7 @@ pub fn restitute(
                     w: sizes[ai].0 as u16,
                     h: sizes[ai].1 as u16,
                 };
-                let mut b_rect = Rect {
+                let b_rect = Rect {
                     x: positions[bi].0,
                     y: positions[bi].1,
                     w: sizes[bi].0 as u16,
@@ -253,11 +254,11 @@ pub fn restitute(
                     }
                 }
             }
-            (ColliderID::Dynamic(ai), ColliderID::Tile(bt, br)) => {
+            (ColliderID::Dynamic(ai), ColliderID::Tile(_bt, br)) => {
                 // println!("INSIDE Dynamic tile case");
                 // let horizontal_mtv = c.mtv.0;
                 // let vertical_mtv = c.mtv.1;
-                let mut a_rect = Rect {
+                let a_rect = Rect {
                     x: positions[ai].0,
                     y: positions[ai].1,
                     w: sizes[ai].0 as u16,

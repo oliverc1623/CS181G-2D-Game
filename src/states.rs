@@ -9,7 +9,6 @@ use crate::types::*;
 use std::collections::HashMap;
 use std::rc::Rc;
 use winit::event::VirtualKeyCode;
-use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
 
 const WIDTH: usize = 320 * 2;
@@ -51,9 +50,6 @@ pub struct GameState {
     pub side_map: Vec<Tilemap>,
 }
 
-// Probably should be WinitInputHelper
-type Input = str;
-
 #[derive(Debug)]
 pub enum StateResult {
     // Pop this state off the stack, update the one before me
@@ -65,6 +61,7 @@ pub enum StateResult {
     // Push a new state on top of this one, update it too
     Push(Box<dyn State>),
 }
+
 pub trait State: std::fmt::Debug {
     fn update(
         &mut self,
@@ -92,6 +89,8 @@ Currently using sketch level timemap
 */
 #[derive(Debug)]
 pub struct Title(); // overworld map
+
+#[allow(unused_variables)]
 impl State for Title {
     fn update(
         &mut self,
@@ -104,8 +103,6 @@ impl State for Title {
     ) -> StateResult {
         // _game.positions[0] = Vec2i(levels[1].1[0].1 * 16, levels[1].1[0].2 * 16);
         let cur_player = _game.players.get_mut(&_game.server.id).unwrap();
-        let max_vel = 20;
-        let min_vel = -20;
         if key_input.key_held(VirtualKeyCode::Right) {
             cur_player.pos.0 += 5;
             if cur_player.pos.0 > (TILE_MAP_SIZE - TILE_SZ) as i32 {
@@ -193,6 +190,7 @@ impl State for Title {
             StateResult::Keep
         }
     }
+    #[allow(unused_variables)]
     fn display(
         &self,
         _game: &GameState,
@@ -210,15 +208,13 @@ impl State for Title {
             map.draw(screen);
         }
         // draw main player
-        let curpos = _game.players[&_game.server.id].pos;
+        // let curpos = _game.players[&_game.server.id].pos;
         // println!("player pos {:?}", &_game.textures[1].image);
         // screen.bitblt(&_game.textures[0], _game.anim_state[0].frame(), curpos);
         // draw positions of other players
-        for ((player, tex), anim) in _game
-            .players
-            .iter()
-            .zip(_game.textures.iter())
-            .zip(_game.anim_state.iter())
+        let cur_world = _game.players[&_game.server.id].world;
+        for player in _game.players.iter()
+            .filter(|p| p.1.world == cur_world)
         {
             // println!("drawing character {}", player.0);
             screen.bitblt(
@@ -229,8 +225,12 @@ impl State for Title {
         }
     }
 }
+
 #[derive(Debug)]
-pub struct Scroll(); // side scroller
+pub struct Scroll();
+
+// side scroller
+#[allow(unused_variables)]
 impl State for Scroll {
     fn update(
         &mut self,
@@ -359,11 +359,9 @@ impl State for Scroll {
         screen.set_scroll(_game.camera);
         // let x = levels[0].0[0];
         levels[_game.level].0[0].draw(screen); //levels[0].0
-        for ((player, tex), anim) in _game
-            .players
-            .iter()
-            .zip(_game.textures.iter())
-            .zip(_game.anim_state.iter())
+        let cur_world = _game.players[&_game.server.id].world;
+        for player in _game.players.iter()
+            .filter(|p| p.1.world == cur_world)
         {
             screen.bitblt(
                 &_game.textures[0],
