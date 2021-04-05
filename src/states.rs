@@ -6,6 +6,9 @@ use crate::server::Server;
 use crate::texture::*;
 use crate::tiles::*;
 use crate::types::*;
+use imageproc::drawing::draw_text;
+use image::{GenericImage, GenericImageView, ImageBuffer, RgbImage, Rgb};
+use rusttype::Font;
 use std::collections::HashMap;
 use std::rc::Rc;
 use winit::event::VirtualKeyCode;
@@ -48,6 +51,7 @@ pub struct GameState {
     pub tt_tileset: Rc<Tileset>,
     pub maps: Vec<Tilemap>,
     pub side_map: Vec<Tilemap>,
+    pub font: Font<'static>,
 }
 
 #[derive(Debug)]
@@ -223,6 +227,10 @@ impl State for Title {
                 player.1.pos,
             );
         }
+        let mut img: RgbImage = ImageBuffer::new(560, 450);
+        let r = Rgb([255; 3]);
+        let sc = rusttype::Scale{x: 20.0, y: 20.0};
+        draw_text(&mut img, r, 0, 0, sc, &_game.font, "SAMPLE");
     }
 }
 

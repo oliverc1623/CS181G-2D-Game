@@ -3,7 +3,7 @@ use std::path::Path;
 use std::rc::Rc;
 
 use winit::dpi::LogicalSize;
-
+use rusttype::Font;
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
 
@@ -472,7 +472,10 @@ fn main() {
         &rsrc.load_texture(Path::new("content/tilesheet.png")),
     ));
 
-    let game = GameState {
+    let font_data: &[u8] = include_bytes!("C:/Users/Oliver Chang/Documents/cs181g/Game2DEngine/content/helvetica.ttf");
+    let font: Font<'static> =  Font::try_from_bytes(font_data).unwrap();
+
+    let mut game = GameState {
         // Every entity has a position, a size, a texture, and animation state.
         // Assume entity 0 is the player
         server,
@@ -507,6 +510,7 @@ fn main() {
         tt_tileset: overworld_tileset,
         maps: get_maps(&other_tileset),
         side_map: get_side_maps(&tileset),
+        font
     };
 
     let state = Game2DEngine::run(
