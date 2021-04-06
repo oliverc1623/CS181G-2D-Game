@@ -23,6 +23,8 @@ pub struct GameData {
     pub score: usize,
     pub speed_multiplier: usize,
     pub num_jumps: usize,
+    pub portals: Vec<(Vec2i, Vec2i)>,
+    pub restart: bool,
 }
 
 pub struct GameState {
@@ -170,6 +172,7 @@ impl State for Title {
             &_game.maps,
             &mut contacts,
             &mut _game.game_data.num_jumps,
+            &mut _game.game_data.restart
         );
         restitute(
             all_pos.as_mut_slice(),
@@ -181,6 +184,7 @@ impl State for Title {
         );
         cur_player.pos = all_pos[0];
         cur_player.vel = all_vel[0];
+
         // _game.camera = cur_player.pos;
 
         _game.server.update_players(&mut _game.players);
@@ -355,6 +359,7 @@ impl State for Scroll {
             &_game.side_map,
             &mut contacts,
             &mut _game.game_data.num_jumps,
+            &mut _game.game_data.restart,
         );
         restitute(
             all_pos.as_mut_slice(),
@@ -366,15 +371,20 @@ impl State for Scroll {
         );
         cur_player.pos = all_pos[0];
         cur_player.vel = all_vel[0];
-        // _game.server.update_players(&mut _game.players);
-        // update camera after restitution
-        // _game.camera.0 += _game.players[&_game.server.id].vel.0;
+
+        if _game.game_data.restart {
+            cur_player.pos = Vec2i(50, 50);
+            _game.game_data.restart = false;
+        }
+
+        for (start, end) in _game.game_data.portals.iter(){
+            if *start == cur_player.pos && _game.game == 1{
+                cur_player.pos = *end;
+            }
+        }
+
         _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH / 2) as i32;
         _game.camera.1 = _game.players[&_game.server.id].pos.1 - (HEIGHT / 2) as i32;
-        // _game.background_pos.0 += -1*_game.players[&_game.server.id].vel.0;
-        // _game.camera.1 += _game.velocities[0].1;
-        // update tilemap after restitution
-        // _game.camera.1 += _game.velocities[0].1;
 
         if key_input.key_held(VirtualKeyCode::X) {
             // StateResult::Remove

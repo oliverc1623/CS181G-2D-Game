@@ -10,6 +10,7 @@ pub const TILE_SZ: usize = 32;
 pub struct Tile {
     pub solid: bool, // ... any extra data like collision flags or other properties
     pub jump_reset: bool,
+    pub restart: bool,
 }
 /// A set of tiles used in multiple Tilemaps
 pub struct Tileset {

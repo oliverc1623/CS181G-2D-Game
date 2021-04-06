@@ -38,166 +38,114 @@ fn main() {
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 0
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 1
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 2
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 3
             Tile {
                 solid: true,
                 jump_reset: true,
+                restart: false,
             }, // 4
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 5
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 6
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: true,
             }, // 7
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 8 stone
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 9
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 10
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 11
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 12
             Tile {
                 solid: false,
                 jump_reset: false,
+                restart: false,
             }, // 13
-            Tile {
-                solid: false,
-                jump_reset: false,
-            }, // 14
-            Tile {
-                solid: false,
-                jump_reset: false,
-            }, // 15
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
-            Tile {
-                solid: false,
-                jump_reset: false,
-            },
+            Tile {solid: false, jump_reset: false,restart: false,}, // 14
+            Tile { solid: false, jump_reset: false, restart: false,}, // 15
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile { solid: false, jump_reset: false,restart: false,},
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false, jump_reset: false,restart: false,},
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false, jump_reset: false,restart: false,},
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false,jump_reset: false, restart: false,},
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false, jump_reset: false,restart: false,},
+            Tile {solid: false, jump_reset: false,restart: false,},
+            Tile { solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false,jump_reset: false,restart: false,},
+            Tile { solid: false,jump_reset: false,restart: false,},
+            Tile {solid: false, jump_reset: false,restart: false,},
         ],
         &rsrc.load_texture(Path::new("content/game2_tilesheet.png")),
     ));
     // overworld tileset
     let overworld_tileset = Rc::new(Tileset::new(
         vec![
-            Tile { solid: false, jump_reset: false },//0
-            Tile { solid: false, jump_reset: false },//1
-            Tile { solid: false, jump_reset: false },//2
-            Tile { solid: false, jump_reset: false },//3
-            Tile { solid: false, jump_reset: false },//4
-            Tile { solid: false, jump_reset: false },//5
-            Tile { solid: false, jump_reset: false },//6
-            Tile { solid: false, jump_reset: false },//7
-            Tile { solid: false, jump_reset: false },//8
-            Tile { solid: false, jump_reset: false },//9
-            Tile { solid: true, jump_reset: false },//10
-            Tile { solid: false, jump_reset: false },//11
-            Tile { solid: false, jump_reset: false },//12
+            Tile { solid: false, jump_reset: false, restart: false },//0
+            Tile { solid: false, jump_reset: false, restart: false },//1
+            Tile { solid: false, jump_reset: false, restart: false },//2
+            Tile { solid: false, jump_reset: false, restart: false },//3
+            Tile { solid: false, jump_reset: false, restart: false },//4
+            Tile { solid: false, jump_reset: false, restart: false },//5
+            Tile { solid: false, jump_reset: false, restart: false },//6
+            Tile { solid: false, jump_reset: false, restart: true },//7
+            Tile { solid: false, jump_reset: false, restart: false },//8
+            Tile { solid: false, jump_reset: false, restart: false },//9
+            Tile { solid: true,  jump_reset: false, restart: false },//10
+            Tile { solid: false, jump_reset: false, restart: false },//11
+            Tile { solid: false, jump_reset: false, restart: false },//12
         ],
         &rsrc.load_texture(Path::new("content/game2_tilesheet.png")),
     ));
@@ -388,14 +336,14 @@ fn main() {
             // Tile grid
             vec![
                 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-                4, 5, 5, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 5, 5, 4, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4,
+                4, 5, 5, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 5, 8, 4, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4,
                 4, 5, 5, 4, 4, 4, 5, 5, 5, 5, 4, 4, 7, 7, 7, 7, 4, 5, 5, 5, 5, 5, 4, 5, 4, 4, 5, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 5, 5, 5, 4, 5, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4,
                 4, 5, 5, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 5, 5, 5, 4, 4, 5, 4, 4, 5, 4, 4, 4, 4, 4, 4, 5, 5, 4, 5, 5, 5, 5, 4, 4, 5, 5, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-                4, 5, 5, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 4, 4, 4, 4, 4, 5, 4, 4, 5, 4, 4, 5, 5, 5, 4, 5, 5, 4, 4, 4, 4, 5, 4, 4, 5, 4, 4, 4, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4,
+                4, 5, 5, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 4, 4, 4, 4, 4, 5, 4, 4, 5, 4, 4, 5, 5, 5, 4, 5, 5, 4, 4, 4, 4, 5, 4, 4, 5, 4, 4, 4, 5, 5, 5, 5, 8, 4, 4, 4, 4, 4, 4,
                 4, 5, 5, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 4, 4, 4, 4, 4, 5, 4, 4, 5, 5, 5, 5, 5, 5, 4, 5, 5, 4, 4, 4, 4, 5, 4, 4, 5, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4,
                 4, 5, 5, 4, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 4, 4, 4, 4, 5, 4, 4, 5, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 3, 10, 4, 4,
                 4, 5, 5, 4, 5, 5, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 4, 4, 4, 4, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 6, 2, 4, 4,
-                4, 5, 5, 4, 5, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 4, 4, 5, 4, 4, 4, 4, 4, 5, 5, 5, 4, 4, 5, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+                4, 5, 5, 4, 5, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 8, 4, 4, 5, 4, 4, 4, 4, 4, 5, 5, 5, 4, 4, 5, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
                 4, 5, 5, 4, 5, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 5, 4, 4, 4, 4, 4, 5, 5, 5, 4, 5, 5, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
                 4, 5, 5, 4, 5, 5, 4, 4, 5, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 7, 4, 7, 4, 7, 4, 4, 5, 4, 4, 4, 4, 4, 4, 5, 5, 4, 7, 7, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
                 4, 5, 5, 4, 4, 5, 4, 4, 5, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 7, 4, 7, 4, 7, 4, 4, 5, 4, 4, 4, 4, 4, 4, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
@@ -528,19 +476,19 @@ fn main() {
 
     let other_tileset = Rc::new(Tileset::new(
         vec![
-            Tile { solid: false, jump_reset: false },//0
-            Tile { solid: false, jump_reset: false },//1
-            Tile { solid: false, jump_reset: false },//2
-            Tile { solid: false, jump_reset: false },//3
-            Tile { solid: false, jump_reset: false },//4
-            Tile { solid: false, jump_reset: false },//5
-            Tile { solid: false, jump_reset: false },//6
-            Tile { solid: false, jump_reset: false },//7
-            Tile { solid: false, jump_reset: false },//8
-            Tile { solid: false, jump_reset: false },//9
-            Tile { solid: true, jump_reset: false },//10
-            Tile { solid: false, jump_reset: false },//11
-            Tile { solid: false, jump_reset: false },//12
+            Tile { solid: false, jump_reset: false, restart: false },//0
+            Tile { solid: false, jump_reset: false, restart: false },//1
+            Tile { solid: false, jump_reset: false, restart: false },//2
+            Tile { solid: false, jump_reset: false, restart: false },//3
+            Tile { solid: false, jump_reset: false, restart: false },//4
+            Tile { solid: false, jump_reset: false, restart: false },//5
+            Tile { solid: false, jump_reset: false, restart: false },//6
+            Tile { solid: false, jump_reset: false, restart: true },//7
+            Tile { solid: false, jump_reset: false, restart: false },//8
+            Tile { solid: false, jump_reset: false, restart: false },//9
+            Tile { solid: true,  jump_reset: false, restart: false },//10
+            Tile { solid: false, jump_reset: false, restart: false },//11
+            Tile { solid: false, jump_reset: false, restart: false },//12
         ],
         &rsrc.load_texture(Path::new("content/game2_tilesheet.png")),
     ));
@@ -578,6 +526,8 @@ fn main() {
             score: 0,
             speed_multiplier: 1,
             num_jumps: 0,
+            portals: vec![(Vec2i(736, 256), Vec2i(672, 32)), (Vec2i(1696,128), Vec2i(1856, 448))],
+            restart: false,
         },
         map_x_boundary,
         map_y_boundary,

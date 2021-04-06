@@ -61,6 +61,7 @@ pub fn gather_contacts(
     tilemap: &Vec<Tilemap>,
     into: &mut Vec<Contact>,
     num_jumps: &mut usize,
+    restart: &mut bool,
 ) {
     // collide mobiles against mobiles
     for (ai, (apos, asize)) in (positions.iter().zip(sizes.iter())).enumerate() {
@@ -103,19 +104,19 @@ pub fn gather_contacts(
         let map = &tilemap[map_indx];
         let (ttl, tlrect) = match map.tile_and_bounds_at(tl) {
             Some((ttl, tlrect)) => (ttl, tlrect),
-            _ => (Tile{solid: false, jump_reset: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
+            _ => (Tile{solid: false, jump_reset: false, restart: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
         };
         let (ttr, trrect) = match map.tile_and_bounds_at(tr) {
             Some((ttr, trrect)) => (ttr, trrect),
-            _ => (Tile{solid: false, jump_reset: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
+            _ => (Tile{solid: false, jump_reset: false, restart: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
         };
         let (btl, blrect) = match map.tile_and_bounds_at(bl) {
             Some((btl, blrect)) => (btl, blrect),
-            _ => (Tile{solid: false, jump_reset: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
+            _ => (Tile{solid: false, jump_reset: false, restart: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
         };
         let (btr, brrect) = match map.tile_and_bounds_at(br) {
             Some((btr, brrect)) => (btr, brrect),
-            _ => (Tile{solid: false, jump_reset: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
+            _ => (Tile{solid: false, jump_reset: false, restart: false}, Rect{x: 0, y: 0, w: 0, h: 0}),
         };
         // println!("touching top left  {:?}", (ttl, tlrect));
         // println!("touching bottom right  {:?}", (btr, brrect));
@@ -187,6 +188,10 @@ pub fn gather_contacts(
             // println!("touching buttom right");
             // println!("jump reset btr");
             *num_jumps = 0;
+        }
+
+        if ttl.restart {
+            *restart = true;
         }
     }
 }
