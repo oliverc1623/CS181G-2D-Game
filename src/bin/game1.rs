@@ -70,7 +70,7 @@ fn main() {
             Tile {
                 solid: false,
                 jump_reset: false,
-            }, // 8 stone
+            }, // 8 
             Tile {
                 solid: false,
                 jump_reset: false,
@@ -102,83 +102,83 @@ fn main() {
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //16
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            },//17
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //18
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //19
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //20
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //21
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //22
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //23
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //24
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //25
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //26
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //27
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //28
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //29
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //30
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //31
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //32
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //33
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //34
             Tile {
                 solid: false,
                 jump_reset: false,
-            },
+            }, //35
         ],
         &rsrc.load_texture(Path::new("content/game2_tilesheet.png")),
     ));
@@ -192,12 +192,35 @@ fn main() {
             Tile { solid: false, jump_reset: false },//4
             Tile { solid: false, jump_reset: false },//5
             Tile { solid: false, jump_reset: false },//6
-            Tile { solid: false, jump_reset: false },//7
+            Tile { solid: true, jump_reset: false },//7
             Tile { solid: false, jump_reset: false },//8
-            Tile { solid: false, jump_reset: false },//9
-            Tile { solid: true, jump_reset: false },//10
+            Tile { solid: true, jump_reset: false },//9
+            Tile { solid: false, jump_reset: false },//10
             Tile { solid: false, jump_reset: false },//11
             Tile { solid: false, jump_reset: false },//12
+            Tile { solid: false, jump_reset: false },//13
+            Tile { solid: false, jump_reset: false },//14
+            Tile { solid: false, jump_reset: false },//15
+            Tile { solid: false, jump_reset: false },//16
+            Tile { solid: false, jump_reset: false },//17
+            Tile { solid: false, jump_reset: false },//18
+            Tile { solid: false, jump_reset: false },//19
+            Tile { solid: false, jump_reset: false },//20
+            Tile { solid: false, jump_reset: false },//21
+            Tile { solid: false, jump_reset: false },//22
+            Tile { solid: false, jump_reset: false },//23
+            Tile { solid: false, jump_reset: false },//24
+            Tile { solid: false, jump_reset: false },//25
+            Tile { solid: false, jump_reset: false },//26
+            Tile { solid: false, jump_reset: false },//27
+            Tile { solid: false, jump_reset: false },//28
+            Tile { solid: false, jump_reset: false },//29
+            Tile { solid: false, jump_reset: false },//30
+            Tile { solid: false, jump_reset: false },//31
+            Tile { solid: false, jump_reset: false },//32
+            Tile { solid: false, jump_reset: false },//33
+            Tile { solid: false, jump_reset: false },//34
+            Tile { solid: false, jump_reset: false },//35
         ],
         &rsrc.load_texture(Path::new("content/game2_tilesheet.png")),
     ));
@@ -208,14 +231,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 8, 8, 8, 8, 8, 8,
-                8, 8, 8, 8, 8, 8, 5, 8,
-                8, 8, 12, 8, 8, 8, 8, 8,
-                8, 8, 8, 8, 12, 8, 8, 8,
-                8, 9, 9, 8, 8, 9, 8, 8,
-                2, 2, 2, 2, 2, 2, 2, 2,
-                8, 8, 9, 9, 8, 9, 9, 8,
-                8, 8, 8, 8, 8, 8, 12, 8,
+                3, 0, 1, 2, 0, 4, 4, 6,
+                1, 0, 2, 3, 3, 6, 9, 9,
+                0, 6, 0, 2, 0, 9, 9, 0,
+                0, 0, 1, 1, 0, 6, 0, 0,
+                4, 0, 0, 0, 0, 6, 0, 0,
+                2, 1, 1, 2, 0, 9, 9, 0,
+                1, 3, 0, 1, 2, 6, 9, 9,
+                0, 3, 2, 1, 0, 3, 6, 6,
             ],
         );
         let map2 = Tilemap::new(
@@ -223,14 +246,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 0, 8, 8, 8, 8, 8,
-                8, 8, 0, 8, 8, 8, 5, 8,
-                8, 8, 0, 8, 8, 8, 12, 8,
-                8, 8, 0, 8, 12, 8, 8, 8,
-                8, 9, 0, 8, 8, 8, 8, 8,
-                2, 2, 2, 8, 8, 6, 8, 8,
-                8, 8, 9, 9, 8, 8, 8, 7,
-                8, 8, 8, 8, 8, 8, 12, 8,
+                0, 2, 2, 1, 3, 0, 6, 0,
+                9, 9, 9, 9, 9, 9, 0, 0,
+                0, 0, 0, 0, 0, 9, 6, 6,
+                0, 0, 0, 0, 0, 9, 2, 6,
+                0, 0, 0, 0, 0, 9, 5, 6,
+                0, 0, 0, 0, 0, 9, 2, 0,
+                9, 0, 0, 0, 0, 9, 3, 3,
+                9, 9, 0, 0, 0, 9, 0, 4,
             ],
         );
         let map3 = Tilemap::new(
@@ -238,9 +261,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 0, 8, 8, 8, 8, 8, 8, 12, 0, 8, 8, 7, 8, 8, 8, 8, 0, 8, 8, 8, 8, 8, 8, 8, 0,
-                4, 8, 8, 8, 8, 8, 8, 0, 8, 8, 12, 8, 8, 8, 8, 0, 9, 8, 8, 8, 8, 8, 8, 2, 2, 8, 8,
-                8, 8, 8, 8, 8, 0, 8, 8, 8, 8,
+                3, 0, 0, 0, 1, 6, 0, 1,
+                0, 7, 7, 0, 0, 0, 2, 3,
+                1, 3, 0, 4, 0, 0, 2, 0,
+                2, 0, 4, 9, 9, 9, 9, 9,
+                1, 3, 9, 9, 0, 0, 0, 0,
+                1, 3, 9, 0, 0, 9, 9, 9,
+                0, 0, 9, 0, 0, 9, 6, 2,
+                6, 2, 9, 0, 0, 9, 1, 0,
             ],
         );
         let map4 = Tilemap::new(
@@ -248,9 +276,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8,
-                8, 8, 8, 10, 7, 8, 8, 8, 8, 8, 8, 10, 6, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 8,
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+                6, 9, 0, 0, 0, 9, 0, 3,
+                1, 9, 0, 0, 0, 9, 4, 4,
+                6, 9, 0, 0, 0, 9, 4, 1,
+                9, 9, 0, 0, 0, 9, 0, 0,
+                0, 0, 0, 0, 0, 9, 6, 3,
+                9, 9, 9, 9, 9, 9, 0, 2,
+                2, 0, 1, 2, 0, 0, 3, 3,
+                2, 3, 0, 0, 3, 0, 2, 0,
             ],
         );
         let map5 = Tilemap::new(
@@ -258,9 +291,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 5, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 8,
-                8, 12, 8, 8, 8, 8, 9, 9, 8, 8, 9, 8, 8, 2, 2, 2, 2, 2, 2, 2, 2, 8, 8, 9, 9, 8, 9,
-                9, 8, 8, 8, 8, 8, 8, 8, 12, 8,
+                0, 3, 9, 0, 0, 9, 9, 9,
+                2, 1, 9, 0, 0, 0, 0, 0,
+                0, 1, 9, 0, 0, 0, 0, 0,
+                3, 6, 9, 9, 9, 9, 9, 9,
+                3, 2, 4, 7, 2, 3, 0, 0,
+                1, 3, 1, 1, 6, 0, 0, 2,
+                0, 7, 10, 0, 0, 2, 6, 6,
+                0, 0, 2, 3, 0, 14, 1, 0,
             ],
         );
         let map6 = Tilemap::new(
@@ -268,9 +306,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 0, 8, 8, 8, 8, 8, 8, 8, 0, 8, 8, 8, 5, 8, 8, 8, 0, 8, 8, 8, 12, 8, 8, 8, 0,
-                8, 12, 8, 8, 8, 8, 9, 0, 8, 8, 8, 8, 8, 2, 2, 2, 8, 8, 6, 8, 8, 8, 8, 9, 9, 8, 8,
-                8, 7, 8, 8, 8, 8, 8, 8, 12, 8,
+                3, 0, 0, 0, 3, 0, 1, 0,
+                2, 1, 0, 0, 1, 6, 0, 1,
+                1, 2, 4, 0, 2, 3, 1, 0,
+                1, 3, 1, 1, 6, 10, 3, 2,
+                0, 1, 10, 0, 4, 2, 6, 6,
+                6, 3, 1, 1, 4, 0, 6, 10,
+                0, 6, 2, 4, 2, 1, 0, 2,
+                4, 0, 2, 1, 3, 3, 0, 1,
             ],
         );
         let map7 = Tilemap::new(
@@ -278,9 +321,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 0, 8, 8, 8, 8, 8, 8, 12, 0, 8, 8, 7, 8, 8, 8, 8, 0, 8, 8, 8, 8, 8, 8, 8, 0,
-                4, 8, 8, 8, 8, 8, 8, 0, 8, 8, 12, 8, 8, 8, 8, 0, 9, 8, 8, 8, 8, 8, 8, 2, 2, 8, 8,
-                8, 8, 8, 8, 8, 0, 8, 8, 8, 8,
+                9, 9, 9, 9, 9, 9, 9, 9,
+                0, 0, 0, 0, 0, 0, 0, 9,
+                0, 0, 0, 0, 0, 0, 0, 9,
+                9, 9, 9, 9, 9, 0, 0, 9,
+                0, 2, 2, 3, 9, 9, 0, 9,
+                3, 1, 0, 3, 6, 9, 0, 9,
+                0, 0, 9, 9, 9, 9, 0, 9,
+                1, 2, 9, 0, 0, 0, 0, 9,
             ],
         );
         let map8 = Tilemap::new(
@@ -288,9 +336,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8,
-                8, 8, 8, 10, 7, 8, 8, 8, 8, 8, 8, 10, 6, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 8,
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+                4, 3, 9, 0, 0, 0, 0, 9,
+                2, 0, 9, 0, 9, 9, 9, 9,
+                0, 10, 9, 0, 9, 9, 9, 9,
+                3, 3, 9, 0, 0, 0, 0, 0,
+                0, 4, 9, 0, 0, 0, 0, 0,
+                6, 6, 9, 9, 9, 9, 9, 9,
+                0, 3, 0, 2, 2, 0, 1, 1,
+                1, 3, 0, 1, 6, 0, 3, 0,
             ],
         );
         let map9 = Tilemap::new(
@@ -298,9 +351,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 5, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 8,
-                8, 12, 8, 8, 8, 8, 9, 9, 8, 8, 9, 8, 8, 2, 2, 2, 2, 2, 2, 2, 2, 8, 8, 9, 9, 8, 9,
-                9, 8, 8, 8, 8, 8, 8, 8, 12, 8,
+                3, 0, 4, 0, 3, 0, 1, 0,
+                2, 1, 0, 3, 1, 6, 0, 1,
+                3, 2, 4, 7, 2, 2, 0, 0,
+                1, 3, 1, 1, 6, 0, 0, 2,
+                0, 9, 9, 0, 0, 2, 6, 6,
+                6, 9, 9, 1, 4, 0, 1, 1,
+                0, 9, 2, 4, 3, 0, 0, 0,
+                0, 2, 2, 0, 3, 3, 0, 6,
             ],
         );
         let map10 = Tilemap::new(
@@ -308,9 +366,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 0, 8, 8, 8, 8, 8, 8, 8, 0, 8, 8, 8, 5, 8, 8, 8, 0, 8, 8, 8, 12, 8, 8, 8, 0,
-                8, 12, 8, 8, 8, 8, 9, 0, 8, 8, 8, 8, 8, 2, 2, 2, 8, 8, 6, 8, 8, 8, 8, 9, 9, 8, 8,
-                8, 7, 8, 8, 8, 8, 8, 8, 12, 8,
+                3, 0, 4, 0, 3, 0, 1, 0,
+                2, 1, 0, 0, 1, 6, 0, 1,
+                3, 2, 4, 7, 2, 3, 0, 0,
+                1, 3, 1, 1, 6, 0, 0, 2,
+                0, 7, 10, 0, 0, 2, 6, 6,
+                6, 7, 1, 1, 4, 0, 6, 10,
+                0, 7, 7, 4, 3, 1, 0, 0,
+                0, 0, 2, 1, 3, 3, 0, 4,
             ],
         );
         let map11 = Tilemap::new(
@@ -318,9 +381,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 0, 8, 8, 8, 8, 8, 8, 12, 0, 8, 8, 7, 8, 8, 8, 8, 0, 8, 8, 8, 8, 8, 8, 8, 0,
-                4, 8, 8, 8, 8, 8, 8, 0, 8, 8, 12, 8, 8, 8, 8, 0, 9, 8, 8, 8, 8, 8, 8, 2, 2, 8, 8,
-                8, 8, 8, 8, 8, 0, 8, 8, 8, 8,
+                3, 0, 0, 0, 3, 0, 1, 0,
+                2, 0, 3, 0, 0, 6, 0, 1,
+                1, 2, 1, 3, 9, 9, 9, 0,
+                1, 2, 1, 1, 4, 2, 9, 9,
+                0, 2, 1, 31, 0, 0, 6, 6,
+                6, 4, 1, 1, 4, 0, 6, 6,
+                0, 2, 0, 3, 4, 4, 0, 0,
+                1, 0, 2, 1, 3, 3, 0, 4,
             ],
         );
         let map12 = Tilemap::new(
@@ -328,9 +396,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8,
-                8, 8, 8, 10, 7, 8, 8, 8, 8, 8, 8, 10, 6, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 8,
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+                4, 4, 6, 1, 0, 2, 0, 2,
+                6, 4, 1, 1, 4, 0, 6, 6,
+                9, 9, 9, 9, 9, 9, 9, 9,
+                0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0,
+                9, 9, 9, 9, 9, 9, 9, 9,
+                1, 3, 2, 3, 2, 3, 2, 0,
+                6, 6, 1, 1, 4, 0, 6, 10,
             ],
         );
         let map13 = Tilemap::new(
@@ -338,9 +411,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 5, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 8,
-                8, 12, 8, 8, 8, 8, 9, 9, 8, 8, 9, 8, 8, 2, 2, 2, 2, 2, 2, 2, 2, 8, 8, 9, 9, 8, 9,
-                9, 8, 8, 8, 8, 8, 8, 8, 12, 8,
+                3, 0, 0, 0, 9, 0, 3, 0,
+                2, 1, 0, 9, 9, 9, 0, 3,
+                3, 2, 9, 9, 9, 9, 9, 2,
+                1, 3, 9, 9, 9, 9, 9, 9,
+                0, 2, 9, 9, 9, 9, 9, 6,
+                3, 6, 1, 1, 9, 9, 9, 0,
+                1, 0, 0, 9, 9, 9, 9, 6,
+                0, 0, 1, 2, 2, 6, 0, 4,
             ],
         );
         let map14 = Tilemap::new(
@@ -348,9 +426,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 0, 8, 8, 8, 8, 8, 8, 8, 0, 8, 8, 8, 5, 8, 8, 8, 0, 8, 8, 8, 12, 8, 8, 8, 0,
-                8, 12, 8, 8, 8, 8, 9, 0, 8, 8, 8, 8, 8, 2, 2, 2, 8, 8, 6, 8, 8, 8, 8, 9, 9, 8, 8,
-                8, 7, 8, 8, 8, 8, 8, 8, 12, 8,
+                3, 0, 0, 0, 3, 0, 1, 2,
+                2, 1, 0, 3, 0, 6, 4, 1,
+                1, 3, 2, 3, 2, 3, 2, 0,
+                1, 3, 1, 23, 6, 0, 0, 4,
+                0, 2, 10, 10, 0, 0, 6, 6,
+                3, 10, 7, 7, 10, 0, 1, 10,
+                0, 10, 7, 7, 10, 4, 1, 0,
+                0, 0, 10, 10, 3, 3, 0, 4,
             ],
         );
         let map15 = Tilemap::new(
@@ -358,9 +441,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 0, 8, 8, 8, 8, 8, 8, 12, 0, 8, 8, 7, 8, 8, 8, 8, 0, 8, 8, 8, 8, 8, 8, 8, 0,
-                4, 8, 8, 8, 8, 8, 8, 0, 8, 8, 12, 8, 8, 8, 8, 0, 9, 8, 8, 8, 8, 8, 8, 2, 2, 8, 8,
-                8, 8, 8, 8, 8, 0, 8, 8, 8, 8,
+                3, 0, 0, 0, 3, 0, 1, 0,
+                2, 1, 0, 0, 0, 6, 0, 1,
+                3, 2, 2, 3, 2, 3, 0, 0,
+                1, 3, 1, 1, 6, 0, 0, 2,
+                0, 2, 1, 0, 0, 0, 6, 6,
+                6, 6, 1, 1, 4, 0, 6, 10,
+                0, 0, 0, 4, 4, 4, 0, 0,
+                0, 0, 2, 1, 3, 3, 0, 4,
             ],
         );
         let map16 = Tilemap::new(
@@ -368,9 +456,14 @@ fn main() {
             (8, 8),
             &tileset,
             vec![
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8,
-                8, 8, 8, 10, 7, 8, 8, 8, 8, 8, 8, 10, 6, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 8,
-                8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+                7, 7, 7, 7, 7, 7, 7, 7,
+                7, 4, 14, 21, 28, 35, 4, 7,
+                9, 12, 6, 6, 6, 6, 31, 7,
+                6, 19, 6, 8, 8, 6, 24, 7,
+                6, 26, 6, 8, 8, 6, 23, 7,
+                9, 33, 6, 6, 6, 6, 16, 7,
+                7, 4, 34, 27, 20, 13, 4, 7,
+                7, 7, 7, 7, 7, 7, 7, 7,
             ],
         );
         return vec![
@@ -535,12 +628,36 @@ fn main() {
             Tile { solid: false, jump_reset: false },//4
             Tile { solid: false, jump_reset: false },//5
             Tile { solid: false, jump_reset: false },//6
-            Tile { solid: false, jump_reset: false },//7
+            Tile { solid: true, jump_reset: false },//7
             Tile { solid: false, jump_reset: false },//8
-            Tile { solid: false, jump_reset: false },//9
-            Tile { solid: true, jump_reset: false },//10
+            Tile { solid: true, jump_reset: false },//9
+            Tile { solid: false, jump_reset: false },//10
             Tile { solid: false, jump_reset: false },//11
             Tile { solid: false, jump_reset: false },//12
+            Tile { solid: false, jump_reset: false },//13
+            Tile { solid: false, jump_reset: false },//14
+            Tile { solid: false, jump_reset: false },//15
+            Tile { solid: false, jump_reset: false },//16
+            Tile { solid: false, jump_reset: false },//17
+            Tile { solid: false, jump_reset: false },//18
+            Tile { solid: false, jump_reset: false },//19
+            Tile { solid: false, jump_reset: false },//20
+            Tile { solid: false, jump_reset: false },//21
+            Tile { solid: false, jump_reset: false },//22
+            Tile { solid: false, jump_reset: false },//23
+            Tile { solid: false, jump_reset: false },//24
+            Tile { solid: false, jump_reset: false },//25
+            Tile { solid: false, jump_reset: false },//26
+            Tile { solid: false, jump_reset: false },//27
+            Tile { solid: false, jump_reset: false },//28
+            Tile { solid: false, jump_reset: false },//29
+            Tile { solid: false, jump_reset: false },//30
+            Tile { solid: false, jump_reset: false },//31
+            Tile { solid: false, jump_reset: false },//32
+            Tile { solid: false, jump_reset: false },//33
+            Tile { solid: false, jump_reset: false },//34
+            Tile { solid: false, jump_reset: false },//35
+            
         ],
         &rsrc.load_texture(Path::new("content/game2_tilesheet.png")),
     ));
