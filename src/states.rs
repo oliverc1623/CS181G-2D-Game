@@ -417,6 +417,8 @@ impl State for Scroll {
         _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH / 2) as i32;
         _game.camera.1 = _game.players[&_game.server.id].pos.1 - (HEIGHT / 2) as i32;
 
+        _game.server.update_players(&mut _game.players);
+
         if key_input.key_held(VirtualKeyCode::X) {
             // StateResult::Remove
             _game.players.get_mut(&_game.server.id).unwrap().vel = Vec2i(0, 0);
