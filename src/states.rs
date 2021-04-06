@@ -7,7 +7,7 @@ use crate::texture::*;
 use crate::tiles::*;
 use crate::types::*;
 use imageproc::drawing::draw_text;
-use image::{GenericImage, GenericImageView, ImageBuffer, RgbImage, Rgb, RgbaImage} ;
+use image::{GenericImage, GenericImageView, ImageBuffer, RgbImage, Rgb, RgbaImage};
 use rusttype::Font;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -25,6 +25,26 @@ pub struct GameData {
     pub num_jumps: usize,
     pub portals: Vec<(Vec2i, Vec2i)>,
     pub restart: bool,
+}
+
+pub struct Text {
+    pub from: Rect,
+    pub to: Vec2i,
+    pub tex: Texture,
+}
+
+impl Text {
+    pub fn new(map_to: Vec2i, text: &str, font: &Font, scale: f32) -> Self {
+        let mut img: RgbaImage = ImageBuffer::new(512, 512);
+        let sc = rusttype::Scale { x: scale, y: scale };
+        let text_img = draw_text(&mut img, image::Rgba([0, 0, 0, 255]), 0, 0, sc, font, text);
+        let tex = Texture::new(text_img);
+        Text {
+            tex,
+            from: Rect { x: 0, y: 0, w: 512, h: 512 },
+            to: map_to,
+        }
+    }
 }
 
 pub struct GameState {
@@ -53,9 +73,11 @@ pub struct GameState {
     pub tt_tileset: Rc<Tileset>,
     pub maps: Vec<Tilemap>,
     pub side_map: Vec<Tilemap>,
-    pub font: Font<'static>,
+    // pub font: Font<'static>,
     pub game: usize,
     pub spawn_point: Vec2i,
+    pub texts_overworld: Vec<Text>,
+    pub texts_sidescroll: Vec<Text>,
 }
 
 #[derive(Debug)]
@@ -173,7 +195,7 @@ impl State for Title {
             &_game.maps,
             &mut contacts,
             &mut _game.game_data.num_jumps,
-            &mut _game.game_data.restart
+            &mut _game.game_data.restart,
         );
         restitute(
             all_pos.as_mut_slice(),
@@ -195,8 +217,8 @@ impl State for Title {
             _game.players.get_mut(&_game.server.id).unwrap().vel = Vec2i(0, 0);
             _game.players.get_mut(&_game.server.id).unwrap().world = 1;
             if _game.game == 2 {
-                _game.players.get_mut(&_game.server.id).unwrap().pos.0 = 3*32;
-                _game.players.get_mut(&_game.server.id).unwrap().pos.1 = 37*32;
+                _game.players.get_mut(&_game.server.id).unwrap().pos.0 = 3 * 32;
+                _game.players.get_mut(&_game.server.id).unwrap().pos.1 = 37 * 32;
             } else {
                 _game.players.get_mut(&_game.server.id).unwrap().pos = Vec2i(50, 50);
             }
@@ -238,19 +260,13 @@ impl State for Title {
                 player.1.pos,
             );
         }
-        let mut img: RgbaImage = ImageBuffer::new(512, 512);
-        let sc = rusttype::Scale{x: 50.0, y: 50.0};        
-        let text_img = draw_text(&mut img, image::Rgba([0,0,0,255]), 0, 0, sc, &_game.font, "SAMPLE");        
-        screen.bitblt(
-            &Texture::new(text_img),
-            Rect {
-                x: 0,
-                y: 0,
-                w: (WIDTH/2)as u16,
-                h: (HEIGHT/2) as u16,
-            },
-            Vec2i(0,0),
-        );
+        for text_img in &_game.texts_overworld {
+            screen.bitblt(
+                &text_img.tex,
+                text_img.from,
+                text_img.to,
+            );
+        }
     }
 }
 
@@ -273,9 +289,9 @@ impl State for Scroll {
         // StateResult::Keep
         let max_vel = 10;
         let min_vel = -10;
-        let mut held_up = false; 
+        let mut held_up = false;
         let mut vert_moving: bool = false;
-        let mut horiz_moving = false; 
+        let mut horiz_moving = false;
         // println!("before {:}", _game.velocities[0].0);
         if key_input.key_held(VirtualKeyCode::Right) {
             // _game.velocities[0].0 = 7;
@@ -285,7 +301,7 @@ impl State for Scroll {
                 cur_player.vel.0 += 2;
                 // println!("inside {:}", _game.velocities[0].0);
             }
-            horiz_moving = true; 
+            horiz_moving = true;
             _game.anim_state[0].tick();
         } else if key_input.key_released(VirtualKeyCode::Right) {
             //cur_player.vel.0 = (cur_player.vel.0 as f32 * 0.25) as i32; 
@@ -297,56 +313,55 @@ impl State for Scroll {
                 cur_player.vel.0 -= 2;
                 // println!("inside {:}", _game.velocities[0].0);
             }
-            horiz_moving = true; 
+            horiz_moving = true;
         } else if key_input.key_released(VirtualKeyCode::Left) {
             //cur_player.vel.0 = (cur_player.vel.0 as f32 * 0.25) as i32;
         }
         if key_input.key_held(VirtualKeyCode::Up) {
             if _game.game_data.num_jumps < 2 && cur_player.vel.1 >= 0 && cur_player.vel.1 >= min_vel {
-                cur_player.vel.1 = -18; 
+                cur_player.vel.1 = -18;
                 _game.game_data.num_jumps += 1;
             } else if _game.game_data.num_jumps < 2 && cur_player.vel.1 < 0 {
-                cur_player.vel.1 += -6; 
+                cur_player.vel.1 += -6;
             }
-            vert_moving = true; 
-            held_up = true; 
+            vert_moving = true;
+            held_up = true;
             if cur_player.vel.1 == 0 {
-                held_up = false; 
+                held_up = false;
             }
-             
         } else if key_input.key_released(VirtualKeyCode::Up) {}
         if key_input.key_held(VirtualKeyCode::Down) {
             if cur_player.vel.1 < max_vel {
                 cur_player.vel.1 += 2;
-                vert_moving = true; 
+                vert_moving = true;
                 // println!("inside {:}", _game.velocities[0].0);
             }
         } else if key_input.key_released(VirtualKeyCode::Down) {
-           // cur_player.vel.1 = (cur_player.vel.1 as f32 * 0.25) as i32;
+            // cur_player.vel.1 = (cur_player.vel.1 as f32 * 0.25) as i32;
         }
 
         if !vert_moving {
             cur_player.vel.1 = (cur_player.vel.1 as f32 * 0.5) as i32;
         }
         if !horiz_moving {
-            cur_player.vel.0 = (cur_player.vel.0 as f32 * 0.5) as i32; 
+            cur_player.vel.0 = (cur_player.vel.0 as f32 * 0.5) as i32;
         }
 
         //if player is not holding the up key, start falling. 
         if !held_up {
-            cur_player.vel.1 = 4; 
+            cur_player.vel.1 = 4;
         }
         // Update all entities' positions
         // update current player
         // println!("{}", cur_player.vel.1);
         cur_player.pos.0 += cur_player.vel.0;
-        cur_player.pos.1 += cur_player.vel.1; 
+        cur_player.pos.1 += cur_player.vel.1;
 
         if cur_player.vel.1 < 0 {
-            cur_player.vel.1 /= 2; 
+            cur_player.vel.1 /= 2;
         }
         if cur_player.vel.1 == -6 {
-            cur_player.vel.1 = 2; 
+            cur_player.vel.1 = 2;
         }
 
         // for (posn, vel) in _game.positions.iter_mut().zip(_game.velocities.iter()) {
@@ -383,8 +398,8 @@ impl State for Scroll {
             _game.game_data.restart = false;
         }
 
-        for (start, end) in _game.game_data.portals.iter(){
-            if *start == cur_player.pos && _game.game == 1{
+        for (start, end) in _game.game_data.portals.iter() {
+            if *start == cur_player.pos && _game.game == 1 {
                 cur_player.pos = *end;
             }
         }
@@ -432,6 +447,13 @@ impl State for Scroll {
                 &_game.textures[0],
                 _game.anim_state[0].frame(),
                 player.1.pos,
+            );
+        }
+        for text_img in &_game.texts_sidescroll {
+            screen.bitblt(
+                &text_img.tex,
+                text_img.from,
+                text_img.to,
             );
         }
     }

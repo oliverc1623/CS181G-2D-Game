@@ -507,9 +507,10 @@ fn main() {
         tt_tileset: overworld_tileset,
         maps: get_maps(&other_tileset),
         side_map: get_side_maps(&tileset),
-        font,
+        // font,
         game: 2, 
         spawn_point: Vec2i(3*32, 37*32),
+
     };
 
     let state = Game2DEngine::run(
