@@ -379,14 +379,24 @@ impl State for Scroll {
         cur_player.vel = all_vel[0];
 
         if _game.game_data.restart {
-            cur_player.pos = Vec2i(50, 50);
+            cur_player.pos = _game.spawn_point;
             _game.game_data.restart = false;
         }
 
+        // println!("player pos {:?}", cur_player.pos);
         for (start, end) in _game.game_data.portals.iter(){
             if *start == cur_player.pos && _game.game == 1{
                 cur_player.pos = *end;
+                _game.spawn_point = *end;
             }
+            if *start == cur_player.pos && _game.game == 2{
+                cur_player.pos = *end;
+                _game.spawn_point = *end;
+            }
+        }
+
+        if cur_player.pos == Vec2i(114*32, 33*32) {
+            println!("win!");
         }
 
         _game.camera.0 = _game.players[&_game.server.id].pos.0 - (WIDTH / 2) as i32;

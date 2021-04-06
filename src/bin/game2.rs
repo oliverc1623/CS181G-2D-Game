@@ -499,7 +499,7 @@ fn main() {
             score: 0,
             speed_multiplier: 1,
             num_jumps: 0,
-            portals: vec![(Vec2i(736, 256), Vec2i(672, 32)), (Vec2i(1696,128), Vec2i(1856, 448))],
+            portals: vec![(Vec2i(26*32, 40*32), Vec2i(3*32, 8*32)), (Vec2i(3008,416), Vec2i(68*32,30*32)), (Vec2i(2306, 1412), Vec2i(79*32, 50*32)), (Vec2i(3328, 1664), Vec2i(87*32, 20*32))],
             restart: false,
         },
         map_x_boundary,
