@@ -79,7 +79,7 @@ fn main() {
                 solid: false,
                 jump_reset: false,
                 restart: false,
-            }, // 8 stone
+            }, // 8
             Tile {
                 solid: false,
                 jump_reset: false,
@@ -105,47 +105,158 @@ fn main() {
                 jump_reset: false,
                 restart: false,
             }, // 13
-            Tile {solid: false, jump_reset: false,restart: false,}, // 14
-            Tile { solid: false, jump_reset: false, restart: false,}, // 15
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile { solid: false, jump_reset: false,restart: false,},
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false, jump_reset: false,restart: false,},
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false, jump_reset: false,restart: false,},
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false,jump_reset: false, restart: false,},
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false, jump_reset: false,restart: false,},
-            Tile {solid: false, jump_reset: false,restart: false,},
-            Tile { solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false,jump_reset: false,restart: false,},
-            Tile { solid: false,jump_reset: false,restart: false,},
-            Tile {solid: false, jump_reset: false,restart: false,},
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, // 14
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, // 15
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //16
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            },//17
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //18
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //19
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //20
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //21
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //22
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //23
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //24
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //25
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //26
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //27
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //28
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //29
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //30
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //31
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //32
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //33
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //34
+            Tile {
+                solid: false,
+                jump_reset: false,
+                restart: false,
+            }, //35
         ],
         &rsrc.load_texture(Path::new("content/game2_tilesheet.png")),
     ));
     // overworld tileset
     let overworld_tileset = Rc::new(Tileset::new(
         vec![
-            Tile { solid: false, jump_reset: false, restart: false },//0
-            Tile { solid: false, jump_reset: false, restart: false },//1
-            Tile { solid: false, jump_reset: false, restart: false },//2
-            Tile { solid: false, jump_reset: false, restart: false },//3
-            Tile { solid: false, jump_reset: false, restart: false },//4
-            Tile { solid: false, jump_reset: false, restart: false },//5
-            Tile { solid: false, jump_reset: false, restart: false },//6
-            Tile { solid: false, jump_reset: false, restart: true },//7
-            Tile { solid: false, jump_reset: false, restart: false },//8
-            Tile { solid: false, jump_reset: false, restart: false },//9
-            Tile { solid: true,  jump_reset: false, restart: false },//10
-            Tile { solid: false, jump_reset: false, restart: false },//11
-            Tile { solid: false, jump_reset: false, restart: false },//12
+            Tile { solid: false, jump_reset: false,restart:false },//0
+            Tile { solid: false, jump_reset: false,restart:false },//1
+            Tile { solid: false, jump_reset: false,restart:false },//2
+            Tile { solid: false, jump_reset: false,restart:false },//3
+            Tile { solid: false, jump_reset: false,restart:false },//4
+            Tile { solid: false, jump_reset: false,restart:false },//5
+            Tile { solid: false, jump_reset: false,restart:false },//6
+            Tile { solid: true, jump_reset: false ,restart:false},//7
+            Tile { solid: false, jump_reset: false,restart:false },//8
+            Tile { solid: true, jump_reset: false ,restart:false},//9
+            Tile { solid: false, jump_reset: false,restart:false },//10
+            Tile { solid: false, jump_reset: false,restart:false },//11
+            Tile { solid: false, jump_reset: false,restart:false },//12
+            Tile { solid: false, jump_reset: false,restart:false },//13
+            Tile { solid: false, jump_reset: false,restart:false },//14
+            Tile { solid: false, jump_reset: false,restart:false },//15
+            Tile { solid: false, jump_reset: false,restart:false },//16
+            Tile { solid: false, jump_reset: false,restart:false },//17
+            Tile { solid: false, jump_reset: false,restart:false },//18
+            Tile { solid: false, jump_reset: false,restart:false },//19
+            Tile { solid: false, jump_reset: false,restart:false },//20
+            Tile { solid: false, jump_reset: false,restart:false },//21
+            Tile { solid: false, jump_reset: false,restart:false },//22
+            Tile { solid: false, jump_reset: false,restart:false },//23
+            Tile { solid: false, jump_reset: false,restart:false },//24
+            Tile { solid: false, jump_reset: false,restart:false },//25
+            Tile { solid: false, jump_reset: false,restart:false },//26
+            Tile { solid: false, jump_reset: false,restart:false },//27
+            Tile { solid: false, jump_reset: false,restart:false },//28
+            Tile { solid: false, jump_reset: false,restart:false },//29
+            Tile { solid: false, jump_reset: false,restart:false },//30
+            Tile { solid: false, jump_reset: false,restart:false },//31
+            Tile { solid: false, jump_reset: false,restart:false },//32
+            Tile { solid: false, jump_reset: false,restart:false },//33
+            Tile { solid: false, jump_reset: false,restart:false },//34
+            Tile { solid: false, jump_reset: false,restart:false },//35
         ],
         &rsrc.load_texture(Path::new("content/game2_tilesheet.png")),
     ));
@@ -537,7 +648,7 @@ fn main() {
 
     let cam = Vec2i((player.pos.0 - WIDTH as i32 / 2).max(0), (player.pos.1 - HEIGHT as i32 / 2).max(0));
     let stack: Vec<Box<dyn State>> = vec![if player.world == 0 { Box::new(Title()) } else { Box::new(Scroll()) }];
-    let level:usize = 1 - player.world as usize;
+    let level: usize = 1 - player.world as usize;
     let mut players = HashMap::<i32, Player>::new();
     players.entry(player.id).or_insert(player);
 
@@ -546,19 +657,42 @@ fn main() {
 
     let other_tileset = Rc::new(Tileset::new(
         vec![
-            Tile { solid: false, jump_reset: false, restart: false },//0
-            Tile { solid: false, jump_reset: false, restart: false },//1
-            Tile { solid: false, jump_reset: false, restart: false },//2
-            Tile { solid: false, jump_reset: false, restart: false },//3
-            Tile { solid: false, jump_reset: false, restart: false },//4
-            Tile { solid: false, jump_reset: false, restart: false },//5
-            Tile { solid: false, jump_reset: false, restart: false },//6
-            Tile { solid: false, jump_reset: false, restart: true },//7
-            Tile { solid: false, jump_reset: false, restart: false },//8
-            Tile { solid: false, jump_reset: false, restart: false },//9
-            Tile { solid: true,  jump_reset: false, restart: false },//10
-            Tile { solid: false, jump_reset: false, restart: false },//11
-            Tile { solid: false, jump_reset: false, restart: false },//12
+                Tile { solid: false, jump_reset: false,restart:false },//0
+                Tile { solid: false, jump_reset: false,restart:false },//1
+                Tile { solid: false, jump_reset: false,restart:false },//2
+                Tile { solid: false, jump_reset: false,restart:false },//3
+                Tile { solid: false, jump_reset: false,restart:false },//4
+                Tile { solid: false, jump_reset: false,restart:false },//5
+                Tile { solid: false, jump_reset: false,restart:false },//6
+                Tile { solid: true, jump_reset: false ,restart:false},//7
+                Tile { solid: false, jump_reset: false,restart:false },//8
+                Tile { solid: true, jump_reset: false ,restart:false},//9
+                Tile { solid: false, jump_reset: false,restart:false },//10
+                Tile { solid: false, jump_reset: false,restart:false },//11
+                Tile { solid: false, jump_reset: false,restart:false },//12
+                Tile { solid: false, jump_reset: false,restart:false },//13
+                Tile { solid: false, jump_reset: false,restart:false },//14
+                Tile { solid: false, jump_reset: false,restart:false },//15
+                Tile { solid: false, jump_reset: false,restart:false },//16
+                Tile { solid: false, jump_reset: false,restart:false },//17
+                Tile { solid: false, jump_reset: false,restart:false },//18
+                Tile { solid: false, jump_reset: false,restart:false },//19
+                Tile { solid: false, jump_reset: false,restart:false },//20
+                Tile { solid: false, jump_reset: false,restart:false },//21
+                Tile { solid: false, jump_reset: false,restart:false },//22
+                Tile { solid: false, jump_reset: false,restart:false },//23
+                Tile { solid: false, jump_reset: false,restart:false },//24
+                Tile { solid: false, jump_reset: false,restart:false },//25
+                Tile { solid: false, jump_reset: false,restart:false },//26
+                Tile { solid: false, jump_reset: false,restart:false },//27
+                Tile { solid: false, jump_reset: false,restart:false },//28
+                Tile { solid: false, jump_reset: false,restart:false },//29
+                Tile { solid: false, jump_reset: false,restart:false },//30
+                Tile { solid: false, jump_reset: false,restart:false },//31
+                Tile { solid: false, jump_reset: false,restart:false },//32
+                Tile { solid: false, jump_reset: false,restart:false },//33
+                Tile { solid: false, jump_reset: false,restart:false },//34
+                Tile { solid: false, jump_reset: false,restart:false },//35
         ],
         &rsrc.load_texture(Path::new("content/game2_tilesheet.png")),
     ));
@@ -596,7 +730,7 @@ fn main() {
             score: 0,
             speed_multiplier: 1,
             num_jumps: 0,
-            portals: vec![(Vec2i(736, 256), Vec2i(672, 32)), (Vec2i(1696,128), Vec2i(1856, 448))],
+            portals: vec![(Vec2i(736, 256), Vec2i(672, 32)), (Vec2i(1696, 128), Vec2i(1856, 448))],
             restart: false,
         },
         map_x_boundary,
@@ -619,7 +753,7 @@ fn main() {
         draw_game,
         update_game,
     );
-    save(&state.players[&state.server.id],"save1.json");
+    save(&state.players[&state.server.id], "save1.json");
 }
 
 fn draw_game(
