@@ -26,10 +26,10 @@ fn main() {
     let window_builder = {
         let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
         WindowBuilder::new()
-            .with_title("Anim2D")
+            .with_title("Exploration of Wiry")
             .with_inner_size(size)
             .with_min_inner_size(size)
-            .with_resizable(false)
+            .with_resizable(true)
     };
     // Here's our resources...
     let rsrc = Resources::new();
@@ -738,9 +738,18 @@ fn main() {
         tt_tileset: overworld_tileset,
         maps: get_maps(&other_tileset),
         side_map: get_side_maps(&tileset),
-        font,
+        // font,
         game: 1,
         spawn_point: Vec2i(50, 50),
+        texts_overworld:vec![
+            Text::new(Vec2i(230,75),"Use arrow keys",&font,25.0),
+            Text::new(Vec2i(260,100),"to move",&font,25.0),
+            Text::new(Vec2i(800,768),"Try to press P",&font,25.0)
+        ],
+        texts_sidescroll:vec![
+            Text::new(Vec2i(300,150),"Don't touch the lava",&font,25.0),
+            Text::new(Vec2i(880,400),"Walls are nice",&font,25.0),
+        ]
     };
 
     let state = Game2DEngine::run(
