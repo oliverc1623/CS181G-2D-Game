@@ -606,6 +606,7 @@ fn main() {
         side_map: get_side_maps(&tileset),
         font,
         game: 1,
+        spawn_point: Vec2i(50, 50),
     };
 
     let state = Game2DEngine::run(

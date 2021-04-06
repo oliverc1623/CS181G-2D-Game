@@ -55,6 +55,7 @@ pub struct GameState {
     pub side_map: Vec<Tilemap>,
     pub font: Font<'static>,
     pub game: usize,
+    pub spawn_point: Vec2i,
 }
 
 #[derive(Debug)]
@@ -193,7 +194,12 @@ impl State for Title {
             // println!("hitting p");
             _game.players.get_mut(&_game.server.id).unwrap().vel = Vec2i(0, 0);
             _game.players.get_mut(&_game.server.id).unwrap().world = 1;
-            _game.players.get_mut(&_game.server.id).unwrap().pos = Vec2i(50, 50);
+            if _game.game == 2 {
+                _game.players.get_mut(&_game.server.id).unwrap().pos.0 = 3*32;
+                _game.players.get_mut(&_game.server.id).unwrap().pos.1 = 37*32;
+            } else {
+                _game.players.get_mut(&_game.server.id).unwrap().pos = Vec2i(50, 50);
+            }
             StateResult::Swap(Box::new(Scroll()))
         } else {
             StateResult::Keep

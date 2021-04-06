@@ -46,7 +46,7 @@ fn main() {
             Tile {solid: false,jump_reset: false,restart: false},//0
             Tile {solid: false,jump_reset: false,restart: false},//1
             Tile {solid: false,jump_reset: false,restart: false},//2
-            Tile {solid: false,jump_reset: false,restart: false},//3
+            Tile {solid: false,jump_reset: false,restart: true},//3
             Tile {solid: false,jump_reset: false,restart: false},//4
             Tile {solid: false,jump_reset: false,restart: false},//5
             Tile {solid: false,jump_reset: false,restart: false},//6
@@ -509,6 +509,7 @@ fn main() {
         side_map: get_side_maps(&tileset),
         font,
         game: 2, 
+        spawn_point: Vec2i(3*32, 37*32),
     };
 
     let state = Game2DEngine::run(
